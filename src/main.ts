@@ -5,7 +5,10 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  await app.listen(configService.get('port') as number);
-  console.log(`API Gateway is running on port ${configService.get('port')}`);
+
+  const appPort = configService.get<number>('port');
+
+  await app.listen(appPort as number);
+  console.log(`API Gateway is running on port ${appPort}`);
 }
 bootstrap();
