@@ -18,7 +18,7 @@ export class AuthController {
   google(): void {}
 
   @Get('google/redirect')
-  // @UseGuards(AuthGuard('google'))
+  @UseGuards(AuthGuard('google'))
   async googleRedirect(
     @Req() req: Request & { user: IOAuthUserDTO },
   ): Promise<void> {
