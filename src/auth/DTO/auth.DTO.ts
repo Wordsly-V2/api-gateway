@@ -17,3 +17,14 @@ export type GGProfileDTO = {
 export interface IOAuthLoginResponseDTO {
   userLoginId: string;
 }
+
+export type JwtAuthPayload = {
+  userLoginId: string;
+  exp?: number;
+  iat?: number;
+  iss?: string;
+  sub?: string;
+  aud?: string;
+  nbf?: number;
+  jti?: string;
+};

@@ -2,10 +2,16 @@ import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { IOAuthLoginResponseDTO, IOAuthUserDTO } from './DTO/auth.DTO';
+import {
+  IOAuthLoginResponseDTO,
+  IOAuthUserDTO,
+  JwtAuthPayload,
+} from './DTO/auth.DTO';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
+import { randomUUID } from 'crypto';
 
 @Controller('auth')
 export class AuthController {
@@ -40,13 +46,25 @@ export class AuthController {
       const loginResponse: IOAuthLoginResponseDTO = await firstValueFrom(
         this.authService.handleOAuthLogin(user),
       );
-      const accessToken = await this.jwtService.signAsync(loginResponse);
+
+      const jwtPayload: JwtAuthPayload = {
+        userLoginId: loginResponse.userLoginId,
+        jti: randomUUID(),
+      };
+
+      const accessToken = await this.jwtService.signAsync(jwtPayload);
 
       return res.redirect(`${frontendRedirectUrl}?access_token=${accessToken}`);
     } catch (error) {
       return res.redirect(
-        `${frontendRedirectUrl}?error=${(error as Error).message}`,
+        `${frontendRedirectUrl}?error=${JSON.stringify(error)}`,
       );
     }
+  }
+
+  @Get('protected')
+  @UseGuards(JwtAuthGuard)
+  protected(): string {
+    return 'protected';
   }
 }
