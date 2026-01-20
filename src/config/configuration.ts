@@ -21,4 +21,8 @@ export default () => ({
       process.env.FRONTEND_REDIRECT_URL ??
       'http://localhost:8000/auth/google/redirect',
   },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  },
 });

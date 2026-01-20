@@ -15,6 +15,5 @@ export type GGProfileDTO = {
 };
 
 export interface IOAuthLoginResponseDTO {
-  accessToken: string;
-  refreshToken: string;
+  userLoginId: string;
 }

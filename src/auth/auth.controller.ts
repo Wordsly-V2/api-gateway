@@ -5,12 +5,14 @@ import { AuthService } from './auth.service';
 import { IOAuthLoginResponseDTO, IOAuthUserDTO } from './DTO/auth.DTO';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Get('/health')
@@ -30,16 +32,21 @@ export class AuthController {
   ) {
     const { user } = req;
 
-    const loginResponse: IOAuthLoginResponseDTO = await firstValueFrom(
-      this.authService.handleOAuthLogin(user),
-    );
-
     const frontendRedirectUrl = this.configService.get(
       'googleOAuth.frontendRedirectUrl',
     ) as string;
 
-    return res.redirect(
-      `${frontendRedirectUrl}?access_token=${loginResponse.accessToken}`,
-    );
+    try {
+      const loginResponse: IOAuthLoginResponseDTO = await firstValueFrom(
+        this.authService.handleOAuthLogin(user),
+      );
+      const accessToken = await this.jwtService.signAsync(loginResponse);
+
+      return res.redirect(`${frontendRedirectUrl}?access_token=${accessToken}`);
+    } catch (error) {
+      return res.redirect(
+        `${frontendRedirectUrl}?error=${(error as Error).message}`,
+      );
+    }
   }
 }
