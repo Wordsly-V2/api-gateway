@@ -4,9 +4,11 @@ import { AuthService } from './auth.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleStrategy } from './strategy/google.strategy';
+import { UsersController } from './users/users.controller';
+import { UsersService } from './users/users.service';
 
 @Module({
-  controllers: [AuthController],
+  controllers: [AuthController, UsersController],
   imports: [
     ClientsModule.registerAsync([
       {
@@ -31,6 +33,6 @@ import { GoogleStrategy } from './strategy/google.strategy';
       },
     ]),
   ],
-  providers: [AuthService, GoogleStrategy],
+  providers: [AuthService, GoogleStrategy, UsersService],
 })
 export class AuthModule {}

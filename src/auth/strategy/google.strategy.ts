@@ -28,9 +28,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       id,
       displayName,
       email: emails[0]?.value,
-      picture:
-        photos[0]?.value ??
-        (this.configService.get('googleOAuth.defaultAvatarUrl') as string),
+      picture: photos[0]?.value,
       provider: provider as IOAuthUserDTO['provider'],
     };
 

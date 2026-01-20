@@ -1,5 +1,9 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
+import { randomUUID } from 'crypto';
+import type { Response } from 'express';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import {
@@ -7,11 +11,6 @@ import {
   IOAuthUserDTO,
   JwtAuthPayload,
 } from './DTO/auth.DTO';
-import { ConfigService } from '@nestjs/config';
-import type { Response } from 'express';
-import { JwtService } from '@nestjs/jwt';
-import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
-import { randomUUID } from 'crypto';
 
 @Controller('auth')
 export class AuthController {
@@ -60,11 +59,5 @@ export class AuthController {
         `${frontendRedirectUrl}?error=${JSON.stringify(error)}`,
       );
     }
-  }
-
-  @Get('protected')
-  @UseGuards(JwtAuthGuard)
-  protected(): string {
-    return 'protected';
   }
 }
