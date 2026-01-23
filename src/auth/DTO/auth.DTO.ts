@@ -1,12 +1,12 @@
-export interface IOAuthUserDTO {
+export type OAuthUser = {
   id: string;
   displayName: string;
   email: string;
   picture: string;
   provider: 'google' | 'facebook';
-}
+};
 
-export type GGProfileDTO = {
+export type OAuthProfile = {
   id: string;
   displayName: string;
   emails: { value: string }[];
@@ -14,12 +14,11 @@ export type GGProfileDTO = {
   provider: string;
 };
 
-export interface IOAuthLoginResponseDTO {
+export type OAuthLoginServiceResponse = {
   userLoginId: string;
-}
+};
 
 export type JwtAuthPayload = {
-  userLoginId: string;
   exp?: number;
   iat?: number;
   iss?: string;
@@ -27,4 +26,8 @@ export type JwtAuthPayload = {
   aud?: string;
   nbf?: number;
   jti?: string;
+} & Pick<OAuthLoginServiceResponse, 'userLoginId'>;
+
+export type LoginResponse = {
+  accessToken: string;
 };

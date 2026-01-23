@@ -20,7 +20,6 @@ import { UsersService } from './users/users.service';
           const port = config.get('authService.port') as number;
 
           console.log('authService address: ', { host, port });
-          console.log('authService address: ', process.env.AUTH_SERVICE_HOST);
 
           return {
             transport: Transport.TCP,

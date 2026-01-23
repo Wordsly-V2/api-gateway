@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { GGProfileDTO, IOAuthUserDTO } from '../DTO/auth.DTO';
+import { OAuthProfile, OAuthUser } from '../DTO/auth.DTO';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -19,17 +19,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   validate(
     accessToken: string,
     refreshToken: string,
-    profile: GGProfileDTO,
+    profile: OAuthProfile,
     done: VerifyCallback,
   ) {
     const { id, displayName, emails, photos, provider } = profile;
 
-    const user: IOAuthUserDTO = {
+    const user: OAuthUser = {
       id,
       displayName,
       email: emails[0]?.value,
       picture: photos[0]?.value,
-      provider: provider as IOAuthUserDTO['provider'],
+      provider: provider as OAuthUser['provider'],
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
