@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { LoginResponse, OAuthUser } from './DTO/auth.DTO';
+import { JwtAuthPayload, LoginResponse, OAuthUser } from './DTO/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,11 +13,28 @@ export class AuthService {
     return await firstValueFrom(this.authService.send('health', ''));
   }
 
-  async handleOAuthLogin(user: OAuthUser): Promise<LoginResponse> {
+  async handleOAuthLogin(
+    user: OAuthUser,
+    userIpAddress: string | undefined,
+  ): Promise<LoginResponse> {
     const loginResponse: LoginResponse = await firstValueFrom(
-      this.authService.send('login_oauth', user),
+      this.authService.send('login_oauth', { user, userIpAddress }),
     );
 
     return loginResponse;
+  }
+
+  async handleRefreshToken({
+    jwtPayload,
+    userIpAddress,
+  }: {
+    jwtPayload: JwtAuthPayload;
+    userIpAddress: string | undefined;
+  }): Promise<LoginResponse> {
+    const refreshTokenResponse: LoginResponse = await firstValueFrom(
+      this.authService.send('refresh_token', { jwtPayload, userIpAddress }),
+    );
+
+    return refreshTokenResponse;
   }
 }
