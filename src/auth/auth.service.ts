@@ -37,4 +37,14 @@ export class AuthService {
 
     return refreshTokenResponse;
   }
+
+  async handleLogout(
+    user: JwtAuthPayload,
+    isLoggedOutFromAllDevices: boolean = false,
+  ): Promise<void> {
+    await firstValueFrom(
+      this.authService.send('logout', { user, isLoggedOutFromAllDevices }),
+    );
+    return;
+  }
 }

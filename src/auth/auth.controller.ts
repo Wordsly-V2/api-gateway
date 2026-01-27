@@ -1,4 +1,12 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
@@ -74,9 +82,27 @@ export class AuthController {
       this.setRefreshTokenCookie(res, newRefreshToken);
 
       return res.status(200).json({ accessToken: newAccessToken });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard('jwt'))
+  async logout(
+    @Req()
+    req: Request & {
+      user: JwtAuthPayload;
+    },
+    @Body() body: { isLoggedOutFromAllDevices?: boolean } = {},
+    @Res() res: Response,
+  ) {
+    const isLoggedOutFromAllDevices = body.isLoggedOutFromAllDevices ?? false;
+    await this.authService.handleLogout(req.user, isLoggedOutFromAllDevices);
+    res.clearCookie('refresh_token');
+    return res.status(200).json({ message: 'Logged out successfully' });
   }
 
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
@@ -84,6 +110,7 @@ export class AuthController {
       'jwt.refreshTokenExpiresIn',
     ) as ms.StringValue;
 
+    res.clearCookie('refresh_token');
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: this.configService.get<string>('nodeEnv') === 'production',
