@@ -28,6 +28,8 @@ import { JwtStrategy } from './strategy/jwt.strategy';
           secret,
           signOptions: {
             expiresIn: expiresIn,
+            algorithm: 'RS256',
+            issuer: 'api-gateway',
           },
         };
       },
