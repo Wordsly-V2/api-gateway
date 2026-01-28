@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthController } from '@/auth/auth.controller';
+import { AuthService } from '@/auth/auth.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { GoogleStrategy } from './strategy/google.strategy';
-import { UsersController } from './users/users.controller';
-import { UsersService } from './users/users.service';
+import { GoogleStrategy } from '@/auth/strategy/google.strategy';
+import { UsersController } from '@/auth/users/users.controller';
+import { UsersService } from '@/auth/users/users.service';
 
 @Module({
   controllers: [AuthController, UsersController],

@@ -10,8 +10,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-import { JwtAuthPayload, LoginResponse, OAuthUser } from './DTO/auth.dto';
+import { AuthService } from '@/auth/auth.service';
+import { JwtAuthPayload, LoginResponse, OAuthUser } from '@/auth/DTO/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import ms from 'ms';
 

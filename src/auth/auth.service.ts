@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { JwtAuthPayload, LoginResponse, OAuthUser } from './DTO/auth.dto';
+import { JwtAuthPayload, LoginResponse, OAuthUser } from '@/auth/DTO/auth.dto';
 
 @Injectable()
 export class AuthService {
