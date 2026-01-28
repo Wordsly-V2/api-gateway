@@ -6,7 +6,7 @@ import {
   Strategy,
   StrategyOptions,
 } from 'passport-jwt';
-import { JwtAuthPayload } from '@/auth/DTO/auth.dto';
+import { JwtAuthPayload } from '@/auth/dto/auth.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
