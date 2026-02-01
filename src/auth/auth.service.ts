@@ -1,27 +1,38 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 import { JwtAuthPayload, LoginResponse, OAuthUser } from '@/auth/dto/auth.dto';
+import { ErrorHandlerService } from '@/error-handler/error-handler.service';
+import { Inject, Injectable } from '@nestjs/common';
+import type { AxiosInstance } from 'axios';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
+    @Inject('AUTH_SERVICE_HTTP')
+    private readonly authServiceHttp: AxiosInstance,
+    private readonly errorHandlerService: ErrorHandlerService,
   ) {}
 
   async getHealth(): Promise<string> {
-    return await firstValueFrom(this.authService.send('health', ''));
+    try {
+      const response = await this.authServiceHttp.get<string>('/health');
+      return response.data;
+    } catch (error) {
+      throw this.errorHandlerService.translateAxiosError(error);
+    }
   }
 
   async handleOAuthLogin(
     user: OAuthUser,
     userIpAddress: string | undefined,
   ): Promise<LoginResponse> {
-    const loginResponse: LoginResponse = await firstValueFrom(
-      this.authService.send('login_oauth', { user, userIpAddress }),
-    );
-
-    return loginResponse;
+    try {
+      const response = await this.authServiceHttp.post<LoginResponse>(
+        '/auth/login-oauth',
+        { user, userIpAddress },
+      );
+      return response.data;
+    } catch (error) {
+      throw this.errorHandlerService.translateAxiosError(error);
+    }
   }
 
   async handleRefreshToken({
@@ -31,20 +42,31 @@ export class AuthService {
     jwtPayload: JwtAuthPayload;
     userIpAddress: string | undefined;
   }): Promise<LoginResponse> {
-    const refreshTokenResponse: LoginResponse = await firstValueFrom(
-      this.authService.send('refresh_token', { jwtPayload, userIpAddress }),
-    );
-
-    return refreshTokenResponse;
+    try {
+      const response = await this.authServiceHttp.post<LoginResponse>(
+        '/auth/refresh-token',
+        { jwtPayload, userIpAddress },
+      );
+      return response.data;
+    } catch (error) {
+      throw this.errorHandlerService.translateAxiosError(error);
+    }
   }
 
   async handleLogout(
     user: JwtAuthPayload,
     isLoggedOutFromAllDevices: boolean = false,
-  ): Promise<void> {
-    await firstValueFrom(
-      this.authService.send('logout', { user, isLoggedOutFromAllDevices }),
-    );
-    return;
+  ): Promise<{ success: boolean }> {
+    try {
+      const response = await this.authServiceHttp.post<{
+        success: boolean;
+      }>('/auth/logout', {
+        user,
+        isLoggedOutFromAllDevices,
+      });
+      return response.data;
+    } catch (error) {
+      throw this.errorHandlerService.translateAxiosError(error);
+    }
   }
 }

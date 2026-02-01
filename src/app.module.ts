@@ -1,11 +1,13 @@
-import { Module } from '@nestjs/common';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 import { AuthModule } from '@/auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtAuthStrategy } from '@/common/guard/jwt-auth/jwt-auth.strategy';
 import configuration from '@/config/configuration';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
-import { JwtStrategy } from '@/strategy/jwt.strategy';
+import { ErrorHandlerModule } from './error-handler/error-handler.module';
+import { HttpClientsModule } from './http-clients/http-clients.module';
 
 @Module({
   imports: [
@@ -34,8 +36,10 @@ import { JwtStrategy } from '@/strategy/jwt.strategy';
         };
       },
     }),
+    ErrorHandlerModule,
+    HttpClientsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtAuthStrategy],
 })
 export class AppModule {}

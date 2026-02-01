@@ -2,8 +2,9 @@ export default () => ({
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parseInt(process.env.PORT ?? '3000', 10) ?? 3000,
   authService: {
-    host: process.env.AUTH_SERVICE_HOST ?? 'auth-service',
-    port: parseInt(process.env.AUTH_SERVICE_TCP_PORT ?? '3002', 10) ?? 3002,
+    host: process.env.AUTH_SERVICE_HOST ?? 'http://localhost:3001',
+    internalToken: process.env.AUTH_SERVICE_INTERNAL_TOKEN ?? '1234567890',
+    httpTimeout: process.env.AUTH_SERVICE_HTTP_TIMEOUT ?? '10000',
   },
   googleOAuth: {
     clientId: process.env.GOOGLE_CLIENT_ID,

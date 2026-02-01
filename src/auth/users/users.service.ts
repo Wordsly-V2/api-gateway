@@ -1,17 +1,22 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 import { IUser } from '@/auth/users/dto/users.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import type { AxiosInstance } from 'axios';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
+    @Inject('AUTH_SERVICE_HTTP')
+    private readonly authServiceHttp: AxiosInstance,
   ) {}
 
-  getProfile(userLoginId: string): Promise<IUser> {
-    return firstValueFrom(
-      this.authService.send('users.get_profile', userLoginId),
-    );
+  async getProfile(userLoginId: string): Promise<IUser> {
+    try {
+      const response = await this.authServiceHttp.get<IUser>(
+        `/users/${userLoginId}/profile`,
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error('Failed to get profile', { cause: error });
+    }
   }
 }
