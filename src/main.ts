@@ -22,4 +22,4 @@ async function bootstrap() {
   console.log(`API Gateway is running on port ${appPort}`);
   console.log(`Frontend base URL: ${frontendBaseUrl}`);
 }
-bootstrap();
+void bootstrap();

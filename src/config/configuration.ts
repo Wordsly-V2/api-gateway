@@ -15,7 +15,7 @@ export default () => ({
 
     // frontend redirect url after google oauth login
     frontendRedirectUrl:
-      process.env.FRONTEND_REDIRECT_URL ??
+      process.env.GOOGLE_FRONTEND_REDIRECT_URL ??
       'http://localhost:4000/auth/redirect',
   },
   frontendBaseUrl: process.env.FRONTEND_BASE_URL ?? 'http://localhost:4000',

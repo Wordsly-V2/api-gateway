@@ -1,3 +1,5 @@
+import { AuthService } from '@/auth/auth.service';
+import { JwtAuthPayload, LoginResponse, OAuthUser } from '@/auth/dto/auth.dto';
 import {
   Body,
   Controller,
@@ -8,11 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { AuthService } from '@/auth/auth.service';
-import { JwtAuthPayload, LoginResponse, OAuthUser } from '@/auth/dto/auth.dto';
-import { JwtService } from '@nestjs/jwt';
 import ms from 'ms';
 
 @Controller('auth')
