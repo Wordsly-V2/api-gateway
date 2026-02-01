@@ -4,7 +4,13 @@ export default () => ({
   authService: {
     host: process.env.AUTH_SERVICE_HOST ?? 'http://localhost:3001',
     internalToken: process.env.AUTH_SERVICE_INTERNAL_TOKEN ?? '1234567890',
-    httpTimeout: process.env.AUTH_SERVICE_HTTP_TIMEOUT ?? '10000',
+    httpTimeout: process.env.AUTH_SERVICE_HTTP_TIMEOUT,
+  },
+  vocabularyService: {
+    host: process.env.VOCABULARY_SERVICE_HOST ?? 'http://localhost:3002',
+    internalToken:
+      process.env.VOCABULARY_SERVICE_INTERNAL_TOKEN ?? '1234567890',
+    httpTimeout: process.env.VOCABULARY_SERVICE_HTTP_TIMEOUT,
   },
   googleOAuth: {
     clientId: process.env.GOOGLE_CLIENT_ID,
