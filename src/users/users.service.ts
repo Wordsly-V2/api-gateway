@@ -1,4 +1,4 @@
-import { IUser } from '@/auth/users/dto/users.dto';
+import { IUser } from '@/users/dto/users.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 

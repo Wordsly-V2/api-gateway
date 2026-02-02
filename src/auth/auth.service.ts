@@ -11,15 +11,6 @@ export class AuthService {
     private readonly errorHandlerService: ErrorHandlerService,
   ) {}
 
-  async getHealth(): Promise<string> {
-    try {
-      const response = await this.authServiceHttp.get<string>('/health');
-      return response.data;
-    } catch (error) {
-      throw this.errorHandlerService.translateAxiosError(error);
-    }
-  }
-
   async handleOAuthLogin(
     user: OAuthUser,
     userIpAddress: string | undefined,

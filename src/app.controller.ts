@@ -6,7 +6,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/health')
-  getHealth(): string {
+  async getHealth() {
     return this.appService.getHealth();
   }
 }

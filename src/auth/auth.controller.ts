@@ -23,11 +23,6 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) {}
 
-  @Get('/health')
-  getHealth() {
-    return this.authService.getHealth();
-  }
-
   @Get('google')
   @UseGuards(AuthGuard('google'))
   google() {}

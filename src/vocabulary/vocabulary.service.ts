@@ -9,13 +9,4 @@ export class VocabularyService {
     private readonly vocabularyServiceHttp: AxiosInstance,
     private readonly errorHandlerService: ErrorHandlerService,
   ) {}
-
-  async getHealth(): Promise<string> {
-    try {
-      const response = await this.vocabularyServiceHttp.get<string>('/health');
-      return response.data;
-    } catch (error) {
-      throw this.errorHandlerService.translateAxiosError(error);
-    }
-  }
 }

@@ -9,6 +9,8 @@ import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 import { ErrorHandlerModule } from './error-handler/error-handler.module';
 import { HttpClientsModule } from './http-clients/http-clients.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
+import { UsersModule } from './users/users.module';
+import { CoursesModule } from './courses/courses.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { VocabularyModule } from './vocabulary/vocabulary.module';
     ErrorHandlerModule,
     HttpClientsModule,
     VocabularyModule,
+    UsersModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtAuthStrategy],
