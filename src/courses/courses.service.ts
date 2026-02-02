@@ -1,4 +1,8 @@
-import { CreateManyCoursesDto, ICourse } from '@/courses/dto/courses.dto';
+import {
+  CreateManyCoursesDto,
+  Course,
+  CourseDetails,
+} from '@/courses/dto/courses.dto';
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
@@ -11,11 +15,11 @@ export class CoursesService {
     private readonly errorHandlerService: ErrorHandlerService,
   ) {}
 
-  async getCourses(userLoginId: string): Promise<{ courses: ICourse[] }> {
+  async getCourses(userLoginId: string): Promise<{ courses: Course[] }> {
     try {
       const response = await this.vocabularyServiceHttp.get<{
-        courses: ICourse[];
-      }>(`/courses/${userLoginId}`);
+        courses: Course[];
+      }>(`/courses/user/${userLoginId}`);
       return response.data;
     } catch (error) {
       throw this.errorHandlerService.translateAxiosError(error);
@@ -29,7 +33,18 @@ export class CoursesService {
     try {
       const response = await this.vocabularyServiceHttp.post<{
         success: boolean;
-      }>(`/courses/${userLoginId}`, courses);
+      }>(`/courses/user/${userLoginId}`, courses);
+      return response.data;
+    } catch (error) {
+      throw this.errorHandlerService.translateAxiosError(error);
+    }
+  }
+
+  async getCourseDetailsById(courseId: string): Promise<CourseDetails> {
+    try {
+      const response = await this.vocabularyServiceHttp.get<CourseDetails>(
+        `/courses/course/${courseId}`,
+      );
       return response.data;
     } catch (error) {
       throw this.errorHandlerService.translateAxiosError(error);

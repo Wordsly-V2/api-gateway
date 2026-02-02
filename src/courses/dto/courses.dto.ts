@@ -7,14 +7,26 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-export interface ICourse {
+export type Course = {
   id: string;
   name: string;
   coverImageUrl?: string;
   userLoginId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
+
+export type Lesson = {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type CourseDetails = Course & {
+  lessons: Lesson[];
+};
 
 export class CreateCourseDto {
   @IsString()

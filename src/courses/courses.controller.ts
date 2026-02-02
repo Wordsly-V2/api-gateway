@@ -1,18 +1,30 @@
 import { JwtAuthPayload } from '@/auth/dto/auth.dto';
 import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
-import { CreateManyCoursesDto, ICourse } from '@/courses/dto/courses.dto';
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  CreateManyCoursesDto,
+  Course,
+  CourseDetails,
+} from '@/courses/dto/courses.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CoursesService } from './courses.service';
 
 @Controller('courses')
+@UseGuards(JwtAuthGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Get('/me/my-courses')
-  @UseGuards(JwtAuthGuard)
   myCourses(
     @Req() req: Request & { user: JwtAuthPayload },
-  ): Promise<{ courses: ICourse[] }> {
+  ): Promise<{ courses: Course[] }> {
     return this.coursesService.getCourses(req.user.userLoginId);
   }
 
@@ -23,5 +35,10 @@ export class CoursesController {
     @Body() body: CreateManyCoursesDto,
   ): Promise<{ success: boolean }> {
     return this.coursesService.createMyCourses(req.user.userLoginId, body);
+  }
+
+  @Get('/:courseId')
+  getCourse(@Param('courseId') courseId: string): Promise<CourseDetails> {
+    return this.coursesService.getCourseDetailsById(courseId);
   }
 }
