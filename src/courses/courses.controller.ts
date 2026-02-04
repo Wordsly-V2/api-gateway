@@ -1,9 +1,9 @@
 import { JwtAuthPayload } from '@/auth/dto/auth.dto';
 import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
 import {
-    CreateManyCoursesDto,
     Course,
     CourseDetails,
+    CreateCourseDto,
 } from '@/courses/dto/courses.dto';
 import {
     Body,
@@ -12,6 +12,7 @@ import {
     Get,
     Param,
     Post,
+    Query,
     Req,
     UseGuards,
 } from '@nestjs/common';
@@ -25,14 +26,24 @@ export class CoursesController {
     @Get('/me/my-courses')
     myCourses(
         @Req() req: Request & { user: JwtAuthPayload },
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('orderByField') orderByField: 'createdAt' | 'name' = 'createdAt',
+        @Query('orderByDirection') orderByDirection: 'asc' | 'desc' = 'asc',
     ): Promise<{ courses: Course[] }> {
-        return this.coursesService.getCourses(req.user.userLoginId);
+        return this.coursesService.getCourses(
+            req.user.userLoginId,
+            page,
+            limit,
+            orderByField,
+            orderByDirection,
+        );
     }
 
     @Post('/me/my-courses')
     createMyCourses(
         @Req() req: Request & { user: JwtAuthPayload },
-        @Body() body: CreateManyCoursesDto,
+        @Body() body: CreateCourseDto,
     ): Promise<{ success: boolean }> {
         return this.coursesService.createMyCourses(req.user.userLoginId, body);
     }

@@ -13,39 +13,39 @@ import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 
 @Module({
-  imports: [
-    AuthModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration],
-    }),
-    JwtModule.registerAsync({
-      global: true,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const secret = config.get('jwt.secret') as string;
-        const expiresIn = config.get(
-          'jwt.expiresIn',
-        ) as JwtSignOptions['expiresIn'];
+    imports: [
+        AuthModule,
+        ConfigModule.forRoot({
+            isGlobal: true,
+            load: [configuration],
+        }),
+        JwtModule.registerAsync({
+            global: true,
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => {
+                const secret = config.get('jwt.secret') as string;
+                const expiresIn = config.get(
+                    'jwt.expiresIn',
+                ) as JwtSignOptions['expiresIn'];
 
-        return {
-          secret,
-          signOptions: {
-            expiresIn: expiresIn,
-            algorithm: 'RS256',
-            issuer: 'api-gateway',
-          },
-        };
-      },
-    }),
-    ErrorHandlerModule,
-    HttpClientsModule,
-    VocabularyModule,
-    UsersModule,
-    CoursesModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService, JwtAuthStrategy],
+                return {
+                    secret,
+                    signOptions: {
+                        expiresIn: expiresIn,
+                        algorithm: 'RS256',
+                        issuer: 'api-gateway',
+                    },
+                };
+            },
+        }),
+        ErrorHandlerModule,
+        HttpClientsModule,
+        VocabularyModule,
+        UsersModule,
+        CoursesModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService, JwtAuthStrategy],
 })
 export class AppModule {}
