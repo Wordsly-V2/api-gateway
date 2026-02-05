@@ -191,6 +191,25 @@ export class CoursesService {
         }
     }
 
+    async createMyCourseLessonWordsBulk(
+        userLoginId: string,
+        courseId: string,
+        lessonId: string,
+        words: CreateCourseLessonWordDto[],
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.post<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk`,
+                words,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
     async updateMyCourseLessonWord(
         userLoginId: string,
         courseId: string,
@@ -222,6 +241,26 @@ export class CoursesService {
                 success: boolean;
             }>(
                 `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/${wordId}`,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async moveMyWordToOtherLesson(
+        userLoginId: string,
+        courseId: string,
+        lessonId: string,
+        wordId: string,
+        targetLessonId: string,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.put<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/${wordId}/move`,
+                { targetLessonId },
             );
             return response.data;
         } catch (error) {

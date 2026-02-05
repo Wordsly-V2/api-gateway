@@ -150,6 +150,21 @@ export class CoursesController {
         );
     }
 
+    @Post('/me/my-courses/:courseId/lessons/:lessonId/words/bulk')
+    createMyCourseLessonWordsBulk(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Body() body: CreateCourseLessonWordDto[],
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.createMyCourseLessonWordsBulk(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            body,
+        );
+    }
+
     @Put('/me/my-courses/:courseId/lessons/:lessonId/words/:wordId')
     updateMyCourseLessonWord(
         @Req() req: Request & { user: JwtAuthPayload },
@@ -179,6 +194,23 @@ export class CoursesController {
             courseId,
             lessonId,
             wordId,
+        );
+    }
+
+    @Put('/me/my-courses/:courseId/lessons/:lessonId/words/:wordId/move')
+    moveMyWordToOtherLesson(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Param('wordId') wordId: string,
+        @Body() body: { targetLessonId: string },
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.moveMyWordToOtherLesson(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            wordId,
+            body.targetLessonId,
         );
     }
 }
