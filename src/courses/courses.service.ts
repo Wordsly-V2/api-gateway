@@ -5,6 +5,7 @@ import {
     CreateCourseDto,
     CreateCourseLessonDto,
     CreateCourseLessonWordDto,
+    Word,
 } from '@/courses/dto/courses.dto';
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { Inject, Injectable } from '@nestjs/common';
@@ -300,6 +301,24 @@ export class CoursesService {
             }>(
                 `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk-delete`,
                 { data: { wordIds } },
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async getWordsByIds(
+        userLoginId: string,
+        courseId: string,
+        wordIds: string,
+    ): Promise<Word[]> {
+        try {
+            const response = await this.vocabularyServiceHttp.get<Word[]>(
+                `/courses/user/${userLoginId}/course/${courseId}/words/by-ids`,
+                {
+                    params: { wordIds },
+                },
             );
             return response.data;
         } catch (error) {

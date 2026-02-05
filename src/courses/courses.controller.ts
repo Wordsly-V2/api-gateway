@@ -7,6 +7,7 @@ import {
     CreateCourseDto,
     CreateCourseLessonDto,
     CreateCourseLessonWordDto,
+    Word,
 } from '@/courses/dto/courses.dto';
 import {
     Body,
@@ -242,6 +243,19 @@ export class CoursesController {
             lessonId,
             wordId,
             body.targetLessonId,
+        );
+    }
+
+    @Get('/me/my-courses/:courseId/words/by-ids')
+    getWordsByIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Query('wordIds') wordIds: string,
+    ): Promise<Word[]> {
+        return this.coursesService.getWordsByIds(
+            req.user.userLoginId,
+            courseId,
+            wordIds,
         );
     }
 }

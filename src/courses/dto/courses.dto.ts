@@ -17,6 +17,16 @@ export type Lesson = {
     updatedAt: Date;
 };
 
+export type Word = {
+    id: string;
+    word: string;
+    meaning: string;
+    pronunciation?: string;
+    partOfSpeech?: string;
+    audioUrl?: string;
+    lessonId: string;
+};
+
 export type CourseDetails = Course & {
     lessons: Lesson[];
 };
