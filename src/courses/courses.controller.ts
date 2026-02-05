@@ -5,6 +5,7 @@ import {
     CourseDetails,
     CoursesTotalStats,
     CreateCourseDto,
+    CreateCourseLessonDto,
 } from '@/courses/dto/courses.dto';
 import {
     Body,
@@ -89,6 +90,47 @@ export class CoursesController {
             req.user.userLoginId,
             courseId,
             body,
+        );
+    }
+
+    @Post('/me/my-courses/:courseId/lessons')
+    createMyCourseLesson(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Body() body: CreateCourseLessonDto,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.createMyCourseLesson(
+            req.user.userLoginId,
+            courseId,
+            body,
+        );
+    }
+
+    @Put('/me/my-courses/:courseId/lessons/:lessonId')
+    updateMyCourseLesson(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Body() body: CreateCourseLessonDto,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.updateMyCourseLesson(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            body,
+        );
+    }
+
+    @Delete('/me/my-courses/:courseId/lessons/:lessonId')
+    deleteMyCourseLesson(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.deleteMyCourseLesson(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
         );
     }
 }

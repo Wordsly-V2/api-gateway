@@ -3,6 +3,7 @@ import {
     CourseDetails,
     CoursesTotalStats,
     CreateCourseDto,
+    CreateCourseLessonDto,
 } from '@/courses/dto/courses.dto';
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { Inject, Injectable } from '@nestjs/common';
@@ -110,6 +111,60 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.put<{
                 success: boolean;
             }>(`/courses/user/${userLoginId}/course/${courseId}`, course);
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async createMyCourseLesson(
+        userLoginId: string,
+        courseId: string,
+        lesson: CreateCourseLessonDto,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.post<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons`,
+                lesson,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async updateMyCourseLesson(
+        userLoginId: string,
+        courseId: string,
+        lessonId: string,
+        lesson: CreateCourseLessonDto,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.put<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}`,
+                lesson,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async deleteMyCourseLesson(
+        userLoginId: string,
+        courseId: string,
+        lessonId: string,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.delete<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}`,
+            );
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

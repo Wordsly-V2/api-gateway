@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export type Course = {
     id: string;
@@ -36,3 +36,21 @@ export type CoursesTotalStats = {
     totalLessons: number;
     totalWords: number;
 };
+
+export class CreateCourseLessonDto {
+    @IsString()
+    @IsNotEmpty()
+    name: string;
+
+    @IsString()
+    @IsOptional()
+    coverImageUrl?: string;
+
+    @IsNumber()
+    @IsOptional()
+    maxWords?: number;
+
+    @IsNumber()
+    @IsOptional()
+    orderIndex?: number;
+}
