@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
 import {
     Course,
     CourseDetails,
+    CoursesTotalStats,
     CreateCourseDto,
 } from '@/courses/dto/courses.dto';
 import {
@@ -12,6 +13,7 @@ import {
     Get,
     Param,
     Post,
+    Put,
     Query,
     Req,
     UseGuards,
@@ -48,6 +50,13 @@ export class CoursesController {
         return this.coursesService.createMyCourses(req.user.userLoginId, body);
     }
 
+    @Get('me/my-courses/total-stats')
+    getTotalStats(
+        @Req() req: Request & { user: JwtAuthPayload },
+    ): Promise<CoursesTotalStats> {
+        return this.coursesService.getCoursesTotalStats(req.user.userLoginId);
+    }
+
     @Delete('/me/my-courses/:courseId')
     deleteMyCourse(
         @Req() req: Request & { user: JwtAuthPayload },
@@ -59,8 +68,27 @@ export class CoursesController {
         );
     }
 
-    @Get('/:courseId')
-    getCourse(@Param('courseId') courseId: string): Promise<CourseDetails> {
-        return this.coursesService.getCourseDetailsById(courseId);
+    @Get('/me/my-courses/:courseId')
+    getCourse(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+    ): Promise<CourseDetails> {
+        return this.coursesService.getCourseDetailsById(
+            req.user.userLoginId,
+            courseId,
+        );
+    }
+
+    @Put('/me/my-courses/:courseId')
+    updateMyCourse(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Body() body: Partial<CreateCourseDto>,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.updateMyCourseById(
+            req.user.userLoginId,
+            courseId,
+            body,
+        );
     }
 }

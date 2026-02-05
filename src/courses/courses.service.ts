@@ -1,6 +1,7 @@
 import {
     Course,
     CourseDetails,
+    CoursesTotalStats,
     CreateCourseDto,
 } from '@/courses/dto/courses.dto';
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
@@ -53,11 +54,14 @@ export class CoursesService {
         }
     }
 
-    async getCourseDetailsById(courseId: string): Promise<CourseDetails> {
+    async getCourseDetailsById(
+        userLoginId: string,
+        courseId: string,
+    ): Promise<CourseDetails> {
         try {
             const response =
                 await this.vocabularyServiceHttp.get<CourseDetails>(
-                    `/courses/course/${courseId}`,
+                    `/courses/user/${userLoginId}/course/${courseId}`,
                 );
             return response.data;
         } catch (error) {
@@ -72,11 +76,40 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.delete<{
                 success: boolean;
-            }>(`/courses/course/${courseId}`, {
+            }>(`/courses/user/${userLoginId}/course/${courseId}`, {
                 data: {
                     userLoginId,
                 },
             });
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async getCoursesTotalStats(
+        userLoginId: string,
+    ): Promise<CoursesTotalStats> {
+        try {
+            const response =
+                await this.vocabularyServiceHttp.get<CoursesTotalStats>(
+                    `/courses/user/${userLoginId}/total-stats`,
+                );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async updateMyCourseById(
+        userLoginId: string,
+        courseId: string,
+        course: Partial<CreateCourseDto>,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.put<{
+                success: boolean;
+            }>(`/courses/user/${userLoginId}/course/${courseId}`, course);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

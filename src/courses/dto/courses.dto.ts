@@ -30,3 +30,9 @@ export class CreateCourseDto {
     @IsOptional()
     coverImageUrl?: string;
 }
+
+export type CoursesTotalStats = {
+    totalCourses: number;
+    totalLessons: number;
+    totalWords: number;
+};
