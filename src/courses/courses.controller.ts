@@ -165,6 +165,37 @@ export class CoursesController {
         );
     }
 
+    @Put('/me/my-courses/:courseId/lessons/:lessonId/words/bulk-move')
+    moveWordsBulkToOtherLesson(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Body() body: { targetLessonId: string; wordIds: string[] },
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.moveWordsBulkToOtherLesson(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            body.wordIds,
+            body.targetLessonId,
+        );
+    }
+
+    @Delete('/me/my-courses/:courseId/lessons/:lessonId/words/bulk-delete')
+    deleteWordsBulkFromLesson(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Body() body: { wordIds: string[] },
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.deleteWordsBulkFromLesson(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            body.wordIds,
+        );
+    }
+
     @Put('/me/my-courses/:courseId/lessons/:lessonId/words/:wordId')
     updateMyCourseLessonWord(
         @Req() req: Request & { user: JwtAuthPayload },

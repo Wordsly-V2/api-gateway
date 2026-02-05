@@ -267,4 +267,43 @@ export class CoursesService {
             throw this.errorHandlerService.translateAxiosError(error);
         }
     }
+
+    async moveWordsBulkToOtherLesson(
+        userLoginId: string,
+        courseId: string,
+        lessonId: string,
+        wordIds: string[],
+        targetLessonId: string,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.put<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk-move`,
+                { wordIds, targetLessonId },
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async deleteWordsBulkFromLesson(
+        userLoginId: string,
+        courseId: string,
+        lessonId: string,
+        wordIds: string[],
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.vocabularyServiceHttp.delete<{
+                success: boolean;
+            }>(
+                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk-delete`,
+                { data: { wordIds } },
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
 }
