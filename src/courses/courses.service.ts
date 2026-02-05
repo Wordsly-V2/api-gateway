@@ -25,6 +25,7 @@ export class CoursesService {
         limit: number,
         orderByField: 'createdAt' | 'name' = 'createdAt',
         orderByDirection: 'asc' | 'desc' = 'asc',
+        searchQuery: string = '',
     ): Promise<{ courses: Course[] }> {
         try {
             const response = await this.vocabularyServiceHttp.get<{
@@ -35,6 +36,7 @@ export class CoursesService {
                     limit,
                     orderByField,
                     orderByDirection,
+                    searchQuery,
                 },
             });
             return response.data;

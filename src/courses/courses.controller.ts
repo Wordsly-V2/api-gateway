@@ -35,6 +35,7 @@ export class CoursesController {
         @Query('limit') limit: number = 10,
         @Query('orderByField') orderByField: 'createdAt' | 'name' = 'createdAt',
         @Query('orderByDirection') orderByDirection: 'asc' | 'desc' = 'asc',
+        @Query('searchQuery') searchQuery: string = '',
     ): Promise<{ courses: Course[] }> {
         return this.coursesService.getCourses(
             req.user.userLoginId,
@@ -42,6 +43,7 @@ export class CoursesController {
             limit,
             orderByField,
             orderByDirection,
+            searchQuery,
         );
     }
 
