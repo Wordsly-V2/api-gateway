@@ -54,3 +54,25 @@ export class CreateCourseLessonDto {
     @IsOptional()
     orderIndex?: number;
 }
+
+export class CreateCourseLessonWordDto {
+    @IsString()
+    @IsNotEmpty()
+    word: string;
+
+    @IsString()
+    @IsNotEmpty()
+    meaning: string;
+
+    @IsString()
+    @IsOptional()
+    pronunciation?: string;
+
+    @IsString()
+    @IsOptional()
+    partOfSpeech?: string;
+
+    @IsString()
+    @IsOptional()
+    audioUrl?: string;
+}

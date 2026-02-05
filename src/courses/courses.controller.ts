@@ -6,6 +6,7 @@ import {
     CoursesTotalStats,
     CreateCourseDto,
     CreateCourseLessonDto,
+    CreateCourseLessonWordDto,
 } from '@/courses/dto/courses.dto';
 import {
     Body,
@@ -131,6 +132,53 @@ export class CoursesController {
             req.user.userLoginId,
             courseId,
             lessonId,
+        );
+    }
+
+    @Post('/me/my-courses/:courseId/lessons/:lessonId/words')
+    createMyCourseLessonWord(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Body() body: CreateCourseLessonWordDto,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.createMyCourseLessonWord(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            body,
+        );
+    }
+
+    @Put('/me/my-courses/:courseId/lessons/:lessonId/words/:wordId')
+    updateMyCourseLessonWord(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Param('wordId') wordId: string,
+        @Body() body: CreateCourseLessonWordDto,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.updateMyCourseLessonWord(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            wordId,
+            body,
+        );
+    }
+
+    @Delete('/me/my-courses/:courseId/lessons/:lessonId/words/:wordId')
+    deleteMyCourseLessonWord(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId') courseId: string,
+        @Param('lessonId') lessonId: string,
+        @Param('wordId') wordId: string,
+    ): Promise<{ success: boolean }> {
+        return this.coursesService.deleteMyCourseLessonWord(
+            req.user.userLoginId,
+            courseId,
+            lessonId,
+            wordId,
         );
     }
 }
