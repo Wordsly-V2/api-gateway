@@ -308,13 +308,13 @@ export class CoursesService {
     async getWordsByIds(
         userLoginId: string,
         courseId: string,
-        wordIds: string,
+        ids: string,
     ): Promise<Word[]> {
         try {
             const response = await this.vocabularyServiceHttp.get<Word[]>(
-                `/users/${userLoginId}/courses/${courseId}/words/by-ids`,
+                `/users/${userLoginId}/courses/${courseId}/words`,
                 {
-                    params: { wordIds },
+                    params: { ids },
                 },
             );
             return response.data;

@@ -248,16 +248,16 @@ export class CoursesController {
         );
     }
 
-    @Get('/me/my-courses/:courseId/words/by-ids')
+    @Get('/me/my-courses/:courseId/words')
     getWordsByIds(
         @Req() req: Request & { user: JwtAuthPayload },
         @Param('courseId') courseId: string,
-        @Query('wordIds') wordIds: string,
+        @Query('ids') ids: string,
     ): Promise<Word[]> {
         return this.coursesService.getWordsByIds(
             req.user.userLoginId,
             courseId,
-            wordIds,
+            ids,
         );
     }
 }
