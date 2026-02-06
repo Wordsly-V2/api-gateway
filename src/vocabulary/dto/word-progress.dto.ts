@@ -1,0 +1,179 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+    IsArray,
+    IsEnum,
+    IsNumber,
+    IsUUID,
+    ValidateNested,
+} from 'class-validator';
+
+export enum AnswerQuality {
+    COMPLETE_BLACKOUT = 0,
+    INCORRECT = 1,
+    INCORRECT_BUT_EASY = 2,
+    CORRECT_WITH_DIFFICULTY = 3,
+    CORRECT_WITH_HESITATION = 4,
+    PERFECT = 5,
+}
+
+export class RecordAnswerDto {
+    @ApiProperty({
+        description: 'The ID of the word being reviewed',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @IsUUID()
+    wordId: string;
+
+    @ApiProperty({
+        description: 'Quality of the answer (0-5)',
+        enum: AnswerQuality,
+        example: 4,
+    })
+    @IsEnum(AnswerQuality)
+    quality: AnswerQuality;
+}
+
+export class BulkRecordAnswersDto {
+    @ApiProperty({
+        description: 'Array of word answers to record',
+        type: [RecordAnswerDto],
+    })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => RecordAnswerDto)
+    answers: RecordAnswerDto[];
+}
+
+export class WordProgressResponseDto {
+    @ApiProperty({
+        description: 'Word progress ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    id: string;
+
+    @ApiProperty({
+        description: 'Word ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    wordId: string;
+
+    @ApiProperty({
+        description: 'User login ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    userLoginId: string;
+
+    @ApiProperty({
+        description: 'Ease factor (difficulty)',
+        example: 2.5,
+    })
+    @IsNumber()
+    easeFactor: number;
+
+    @ApiProperty({
+        description: 'Interval in days until next review',
+        example: 3,
+    })
+    @IsNumber()
+    interval: number;
+
+    @ApiProperty({
+        description: 'Number of consecutive correct answers',
+        example: 2,
+    })
+    @IsNumber()
+    repetitions: number;
+
+    @ApiPropertyOptional({
+        description: 'Last review date',
+        example: '2026-02-06T09:15:44.000Z',
+    })
+    lastReviewedAt?: Date;
+
+    @ApiProperty({
+        description: 'Next review date',
+        example: '2026-02-09T09:15:44.000Z',
+    })
+    nextReviewAt: Date;
+
+    @ApiProperty({
+        description: 'Total number of reviews',
+        example: 5,
+    })
+    @IsNumber()
+    totalReviews: number;
+
+    @ApiProperty({
+        description: 'Number of correct reviews',
+        example: 4,
+    })
+    @IsNumber()
+    correctReviews: number;
+
+    @ApiProperty({
+        description: 'Success rate percentage',
+        example: 80,
+    })
+    @IsNumber()
+    successRate: number;
+}
+
+export class DueWordDto extends WordProgressResponseDto {
+    @ApiProperty({
+        description: 'Word details',
+    })
+    word: {
+        id: string;
+        word: string;
+        meaning: string;
+        pronunciation?: string;
+        partOfSpeech?: string;
+        audioUrl?: string;
+        lessonId: string;
+    };
+
+    @ApiProperty({
+        description: 'Whether this is a new word (not yet reviewed)',
+        example: false,
+    })
+    isNew: boolean;
+}
+
+export class WordProgressStatsDto {
+    @ApiProperty({
+        description: 'Total words in learning',
+        example: 150,
+    })
+    totalWords: number;
+
+    @ApiProperty({
+        description: 'New words not yet reviewed',
+        example: 30,
+    })
+    newWords: number;
+
+    @ApiProperty({
+        description: 'Words currently in learning phase',
+        example: 45,
+    })
+    learningWords: number;
+
+    @ApiProperty({
+        description: 'Words in review phase',
+        example: 75,
+    })
+    reviewWords: number;
+
+    @ApiProperty({
+        description: 'Words due for review today',
+        example: 20,
+    })
+    dueToday: number;
+
+    @ApiProperty({
+        description: 'Overall success rate percentage',
+        example: 85.5,
+    })
+    overallSuccessRate: number;
+}
