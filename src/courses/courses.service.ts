@@ -5,6 +5,7 @@ import {
     CreateCourseDto,
     CreateCourseLessonDto,
     CreateCourseLessonWordDto,
+    ReorderLessonsDto,
     Word,
 } from '@/courses/dto/courses.dto';
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
@@ -317,6 +318,23 @@ export class CoursesService {
                     params: { ids },
                 },
             );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async reorderLessons(
+        userLoginId: string,
+        courseId: string,
+        reorderLessonsDto: ReorderLessonsDto,
+    ): Promise<ReorderLessonsDto> {
+        try {
+            const response =
+                await this.vocabularyServiceHttp.put<ReorderLessonsDto>(
+                    `/users/${userLoginId}/courses/${courseId}/lessons/reorder`,
+                    reorderLessonsDto,
+                );
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

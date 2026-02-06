@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+    IsInt,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Min,
+    IsUUID,
+} from 'class-validator';
 
 export type Course = {
     id: string;
@@ -85,4 +94,24 @@ export class CreateCourseLessonWordDto {
     @IsString()
     @IsOptional()
     audioUrl?: string;
+}
+
+export class ReorderLessonsDto {
+    @ApiProperty({
+        description: 'ID of the lesson that was dragged',
+        example: '01936c1e-1234-7890-abcd-ef1234567890',
+    })
+    @IsUUID()
+    @IsNotEmpty()
+    lessonId: string;
+
+    @ApiProperty({
+        description:
+            'Target position (1-based). The dragged lesson will be placed at this order index.',
+        example: 3,
+        minimum: 1,
+    })
+    @IsInt()
+    @Min(1)
+    targetOrderIndex: number;
 }
