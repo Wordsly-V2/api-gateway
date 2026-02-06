@@ -4,6 +4,8 @@ import type { AxiosInstance } from 'axios';
 import {
     BulkRecordAnswersDto,
     DueWordDto,
+    DueWordIdsResponseDto,
+    GetDueWordsQueryDto,
     RecordAnswerDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
@@ -66,6 +68,26 @@ export class VocabularyService {
                     },
                 },
             );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async getDueWordIds(
+        userLoginId: string,
+        query: GetDueWordsQueryDto,
+    ): Promise<DueWordIdsResponseDto> {
+        try {
+            const response =
+                await this.vocabularyServiceHttp.get<DueWordIdsResponseDto>(
+                    `/users/${userLoginId}/word-progress/due-word-ids`,
+                    {
+                        params: {
+                            ...query,
+                        },
+                    },
+                );
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

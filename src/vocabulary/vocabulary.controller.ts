@@ -22,6 +22,8 @@ import {
 import {
     BulkRecordAnswersDto,
     DueWordDto,
+    DueWordIdsResponseDto,
+    GetDueWordsQueryDto,
     RecordAnswerDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
@@ -121,6 +123,59 @@ export class VocabularyController {
             limit,
             includeNew,
         );
+    }
+
+    @Get('word-progress/due-word-ids')
+    @ApiOperation({
+        summary: 'Get IDs of words due for review',
+        description:
+            'Same as due-words but returns only a list of word IDs. Uses the same filters (courseId, lessonId, limit, includeNew) and ordering.',
+    })
+    @ApiParam({
+        name: 'userLoginId',
+        description: 'User login ID',
+        example: 'user123',
+    })
+    @ApiQuery({
+        name: 'courseId',
+        required: false,
+        type: String,
+        description: 'Filter by specific course',
+    })
+    @ApiQuery({
+        name: 'lessonId',
+        required: false,
+        type: String,
+        description: 'Filter by specific lesson',
+    })
+    @ApiQuery({
+        name: 'limit',
+        required: false,
+        type: Number,
+        description: 'Maximum number of word IDs to return (1-100)',
+        example: 20,
+    })
+    @ApiQuery({
+        name: 'includeNew',
+        required: false,
+        type: Boolean,
+        description: 'Include new words not yet reviewed',
+        example: true,
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Due word IDs retrieved successfully',
+        type: DueWordIdsResponseDto,
+    })
+    async getDueWordIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Query() query: GetDueWordsQueryDto,
+    ): Promise<DueWordIdsResponseDto> {
+        const wordIds = await this.vocabularyService.getDueWordIds(
+            req.user.userLoginId,
+            query,
+        );
+        return wordIds;
     }
 
     @Get('word-progress/stats')

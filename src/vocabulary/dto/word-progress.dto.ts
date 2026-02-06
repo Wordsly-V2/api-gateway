@@ -1,10 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
+    IsBoolean,
     IsEnum,
+    IsInt,
     IsNumber,
+    IsOptional,
     IsUUID,
+    Max,
+    Min,
     ValidateNested,
 } from 'class-validator';
 
@@ -138,6 +143,65 @@ export class DueWordDto extends WordProgressResponseDto {
         example: false,
     })
     isNew: boolean;
+}
+
+export class GetDueWordsQueryDto {
+    @ApiPropertyOptional({
+        description: 'Filter by specific course ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @IsOptional()
+    @IsUUID()
+    courseId?: string;
+
+    @ApiPropertyOptional({
+        description: 'Filter by specific lesson ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @IsOptional()
+    @IsUUID()
+    lessonId?: string;
+
+    @ApiPropertyOptional({
+        description: 'Maximum number of words to return',
+        example: 20,
+        default: 20,
+        minimum: 1,
+        maximum: 100,
+    })
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @Max(100)
+    limit?: number = 20;
+
+    @ApiPropertyOptional({
+        description: 'Include new words (not yet reviewed)',
+        example: true,
+        default: true,
+    })
+    @IsOptional()
+    @Transform(({ value }) => {
+        if (value === 'true' || value === true) return true;
+        if (value === 'false' || value === false) return false;
+        return true;
+    })
+    @IsBoolean()
+    includeNew?: boolean = true;
+}
+
+export class DueWordIdsResponseDto {
+    @ApiProperty({
+        description:
+            'List of word IDs that are due for review (same order as due-words API)',
+        type: [String],
+        example: [
+            '01936b3e-7c8f-7890-abcd-ef1234567890',
+            '01936b3e-7c8f-7890-abcd-ef1234567891',
+        ],
+    })
+    wordIds: string[];
 }
 
 export class WordProgressStatsDto {
