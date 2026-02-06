@@ -30,7 +30,7 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.get<{
                 courses: Course[];
-            }>(`/courses/user/${userLoginId}`, {
+            }>(`/users/${userLoginId}/courses`, {
                 params: {
                     page,
                     limit,
@@ -52,7 +52,7 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.post<{
                 success: boolean;
-            }>(`/courses/user/${userLoginId}`, course);
+            }>(`/users/${userLoginId}/courses`, course);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
@@ -66,7 +66,7 @@ export class CoursesService {
         try {
             const response =
                 await this.vocabularyServiceHttp.get<CourseDetails>(
-                    `/courses/user/${userLoginId}/course/${courseId}`,
+                    `/users/${userLoginId}/courses/${courseId}`,
                 );
             return response.data;
         } catch (error) {
@@ -81,7 +81,7 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.delete<{
                 success: boolean;
-            }>(`/courses/user/${userLoginId}/course/${courseId}`, {
+            }>(`/users/${userLoginId}/courses/${courseId}`, {
                 data: {
                     userLoginId,
                 },
@@ -98,7 +98,7 @@ export class CoursesService {
         try {
             const response =
                 await this.vocabularyServiceHttp.get<CoursesTotalStats>(
-                    `/courses/user/${userLoginId}/total-stats`,
+                    `/users/${userLoginId}/courses/total-stats`,
                 );
             return response.data;
         } catch (error) {
@@ -114,7 +114,7 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.put<{
                 success: boolean;
-            }>(`/courses/user/${userLoginId}/course/${courseId}`, course);
+            }>(`/users/${userLoginId}/courses/${courseId}`, course);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
@@ -129,10 +129,7 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.post<{
                 success: boolean;
-            }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons`,
-                lesson,
-            );
+            }>(`/users/${userLoginId}/courses/${courseId}/lessons`, lesson);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
@@ -149,7 +146,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.put<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}`,
                 lesson,
             );
             return response.data;
@@ -166,9 +163,7 @@ export class CoursesService {
         try {
             const response = await this.vocabularyServiceHttp.delete<{
                 success: boolean;
-            }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}`,
-            );
+            }>(`/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}`);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
@@ -185,7 +180,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.post<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words`,
                 word,
             );
             return response.data;
@@ -204,7 +199,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.post<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/bulk`,
                 words,
             );
             return response.data;
@@ -224,7 +219,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.put<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/${wordId}`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/${wordId}`,
                 word,
             );
             return response.data;
@@ -243,7 +238,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.delete<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/${wordId}`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/${wordId}`,
             );
             return response.data;
         } catch (error) {
@@ -262,7 +257,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.put<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/${wordId}/move`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/${wordId}/move`,
                 { targetLessonId },
             );
             return response.data;
@@ -282,7 +277,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.put<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk-move`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/bulk-move`,
                 { wordIds, targetLessonId },
             );
             return response.data;
@@ -301,7 +296,7 @@ export class CoursesService {
             const response = await this.vocabularyServiceHttp.delete<{
                 success: boolean;
             }>(
-                `/courses/user/${userLoginId}/course/${courseId}/lessons/${lessonId}/words/bulk-delete`,
+                `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/bulk-delete`,
                 { data: { wordIds } },
             );
             return response.data;
@@ -317,7 +312,7 @@ export class CoursesService {
     ): Promise<Word[]> {
         try {
             const response = await this.vocabularyServiceHttp.get<Word[]>(
-                `/courses/user/${userLoginId}/course/${courseId}/words/by-ids`,
+                `/users/${userLoginId}/courses/${courseId}/words/by-ids`,
                 {
                     params: { wordIds },
                 },
