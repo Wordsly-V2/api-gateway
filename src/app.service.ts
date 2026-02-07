@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ErrorHandlerService } from './error-handler/error-handler.service';
 import type { AxiosInstance } from 'axios';
 
 type ServiceHealth = {
@@ -15,15 +14,12 @@ export class AppService {
         private readonly authServiceHttp: AxiosInstance,
         @Inject('VOCABULARY_SERVICE_HTTP')
         private readonly vocabularyServiceHttp: AxiosInstance,
-        private readonly errorHandlerService: ErrorHandlerService,
     ) {}
 
     private async getAuthServiceHealth(): Promise<ServiceHealth> {
         const name = 'Auth Service';
         try {
-            const response = await this.authServiceHttp.get<string>('/health', {
-                timeout: 100000,
-            });
+            const response = await this.authServiceHttp.get<string>('/health');
             return {
                 name,
                 status: 'healthy',
@@ -41,12 +37,8 @@ export class AppService {
     private async getVocabularyServiceHealth(): Promise<ServiceHealth> {
         const name = 'Vocabulary Service';
         try {
-            const response = await this.vocabularyServiceHttp.get<string>(
-                '/health',
-                {
-                    timeout: 100000,
-                },
-            );
+            const response =
+                await this.vocabularyServiceHttp.get<string>('/health');
             return {
                 name,
                 status: 'healthy',
