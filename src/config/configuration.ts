@@ -24,7 +24,7 @@ export default () => ({
             process.env.GOOGLE_FRONTEND_REDIRECT_URL ??
             'http://localhost:4000/auth/redirect',
     },
-    frontendBaseUrl: process.env.FRONTEND_BASE_URL ?? 'http://localhost:4000',
+    frontendBaseUrls: process.env.FRONTEND_BASE_URLS ?? 'http://localhost:4000',
     jwt: {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
