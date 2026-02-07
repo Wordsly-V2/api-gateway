@@ -21,7 +21,9 @@ export class AppService {
     private async getAuthServiceHealth(): Promise<ServiceHealth> {
         const name = 'Auth Service';
         try {
-            const response = await this.authServiceHttp.get<string>('/health');
+            const response = await this.authServiceHttp.get<string>('/health', {
+                timeout: 100000,
+            });
             return {
                 name,
                 status: 'healthy',
@@ -39,8 +41,12 @@ export class AppService {
     private async getVocabularyServiceHealth(): Promise<ServiceHealth> {
         const name = 'Vocabulary Service';
         try {
-            const response =
-                await this.vocabularyServiceHttp.get<string>('/health');
+            const response = await this.vocabularyServiceHttp.get<string>(
+                '/health',
+                {
+                    timeout: 100000,
+                },
+            );
             return {
                 name,
                 status: 'healthy',
