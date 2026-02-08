@@ -1,10 +1,9 @@
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
-import { KafkaService } from '@/kafka/kafka.service';
 import { KAFKA_TOPICS } from '@/kafka/kafka-topics';
+import { KafkaService } from '@/kafka/kafka.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
-    BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
     RecordAnswerAcceptedDto,
@@ -34,20 +33,6 @@ export class VocabularyService {
             },
         );
         return { accepted: true };
-    }
-
-    async recordAnswers(
-        userLoginId: string,
-        body: BulkRecordAnswersDto,
-    ): Promise<WordProgressResponseDto[]> {
-        try {
-            const response = await this.vocabularyServiceHttp.post<
-                WordProgressResponseDto[]
-            >(`/users/${userLoginId}/word-progress/record-answers`, body);
-            return response.data;
-        } catch (error) {
-            throw this.errorHandlerService.translateAxiosError(error);
-        }
     }
 
     async getDueWordIds(

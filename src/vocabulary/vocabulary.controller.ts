@@ -22,7 +22,6 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import {
-    BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
     RecordAnswerAcceptedDto,
@@ -56,25 +55,6 @@ export class VocabularyController {
         @Body() body: RecordAnswerDto,
     ): Promise<RecordAnswerAcceptedDto> {
         return this.vocabularyService.recordAnswer(req.user.userLoginId, body);
-    }
-
-    @Post('word-progress/record-answers')
-    @ApiOperation({
-        summary: 'Record multiple answers in bulk',
-        description:
-            'Records multiple word answers at once for better performance',
-    })
-    @ApiBody({ type: BulkRecordAnswersDto })
-    @ApiResponse({
-        status: 200,
-        description: 'Answers recorded successfully',
-        type: [WordProgressResponseDto],
-    })
-    recordAnswers(
-        @Req() req: Request & { user: JwtAuthPayload },
-        @Body() body: BulkRecordAnswersDto,
-    ): Promise<WordProgressResponseDto[]> {
-        return this.vocabularyService.recordAnswers(req.user.userLoginId, body);
     }
 
     @Get('word-progress/due-word-ids')
