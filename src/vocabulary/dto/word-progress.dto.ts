@@ -124,27 +124,6 @@ export class WordProgressResponseDto {
     successRate: number;
 }
 
-export class DueWordDto extends WordProgressResponseDto {
-    @ApiProperty({
-        description: 'Word details',
-    })
-    word: {
-        id: string;
-        word: string;
-        meaning: string;
-        pronunciation?: string;
-        partOfSpeech?: string;
-        audioUrl?: string;
-        lessonId: string;
-    };
-
-    @ApiProperty({
-        description: 'Whether this is a new word (not yet reviewed)',
-        example: false,
-    })
-    isNew: boolean;
-}
-
 export class GetDueWordsQueryDto {
     @ApiPropertyOptional({
         description: 'Filter by specific course ID',

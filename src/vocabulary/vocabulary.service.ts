@@ -3,12 +3,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
     BulkRecordAnswersDto,
-    DueWordDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
     RecordAnswerDto,
     WordProgressResponseDto,
-    WordProgressStatsDto,
+    WordProgressStatsDto
 } from './dto/word-progress.dto';
 
 @Injectable()
@@ -49,30 +48,6 @@ export class VocabularyService {
         }
     }
 
-    async getDueWords(
-        userLoginId: string,
-        courseId?: string,
-        lessonId?: string,
-        limit?: number,
-        includeNew?: string,
-    ): Promise<DueWordDto[]> {
-        try {
-            const response = await this.vocabularyServiceHttp.get<DueWordDto[]>(
-                `/users/${userLoginId}/word-progress/due-words`,
-                {
-                    params: {
-                        courseId,
-                        lessonId,
-                        limit,
-                        includeNew,
-                    },
-                },
-            );
-            return response.data;
-        } catch (error) {
-            throw this.errorHandlerService.translateAxiosError(error);
-        }
-    }
 
     async getDueWordIds(
         userLoginId: string,

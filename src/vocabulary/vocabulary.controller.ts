@@ -21,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import {
     BulkRecordAnswersDto,
-    DueWordDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
     RecordAnswerDto,
@@ -72,57 +71,6 @@ export class VocabularyController {
         @Body() body: BulkRecordAnswersDto,
     ): Promise<WordProgressResponseDto[]> {
         return this.vocabularyService.recordAnswers(req.user.userLoginId, body);
-    }
-
-    @Get('word-progress/due-words')
-    @ApiOperation({
-        summary: 'Get words due for review',
-        description:
-            'Retrieves words that are due for review based on spaced repetition algorithm',
-    })
-    @ApiQuery({
-        name: 'courseId',
-        required: false,
-        type: String,
-        description: 'Filter by specific course',
-    })
-    @ApiQuery({
-        name: 'lessonId',
-        required: false,
-        type: String,
-        description: 'Filter by specific lesson',
-    })
-    @ApiQuery({
-        name: 'limit',
-        required: false,
-        type: Number,
-        description: 'Maximum number of words to return',
-    })
-    @ApiQuery({
-        name: 'includeNew',
-        required: false,
-        type: String,
-        description: 'Include new words not yet reviewed',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Due words retrieved successfully',
-        type: [DueWordDto],
-    })
-    getDueWords(
-        @Req() req: Request & { user: JwtAuthPayload },
-        @Query('courseId') courseId?: string,
-        @Query('lessonId') lessonId?: string,
-        @Query('limit') limit?: number,
-        @Query('includeNew') includeNew?: string,
-    ): Promise<DueWordDto[]> {
-        return this.vocabularyService.getDueWords(
-            req.user.userLoginId,
-            courseId,
-            lessonId,
-            limit,
-            includeNew,
-        );
     }
 
     @Get('word-progress/due-word-ids')
