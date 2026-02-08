@@ -1,5 +1,6 @@
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { KAFKA_TOPICS } from '@/kafka/kafka-topics';
+import type { WordProgressRecordAnswerPayload } from '@/kafka/messages';
 import { KafkaService } from '@/kafka/kafka.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
@@ -25,12 +26,13 @@ export class VocabularyService {
         userLoginId: string,
         body: RecordAnswerDto,
     ): Promise<RecordAnswerAcceptedDto> {
+        const payload: WordProgressRecordAnswerPayload = {
+            userLoginId,
+            ...body,
+        };
         await this.kafkaService.sendMessage(
             KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWER,
-            {
-                userLoginId,
-                ...body,
-            },
+            payload,
         );
         return { accepted: true };
     }
