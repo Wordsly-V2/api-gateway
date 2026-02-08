@@ -11,6 +11,7 @@ import { HttpClientsModule } from './http-clients/http-clients.module';
 import { VocabularyModule } from './vocabulary/vocabulary.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
     imports: [
@@ -44,6 +45,7 @@ import { CoursesModule } from './courses/courses.module';
         VocabularyModule,
         UsersModule,
         CoursesModule,
+        KafkaModule,
     ],
     controllers: [AppController],
     providers: [AppService, JwtAuthStrategy],

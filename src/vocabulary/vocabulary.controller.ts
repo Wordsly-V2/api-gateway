@@ -5,6 +5,8 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
+    HttpStatus,
     Param,
     Post,
     Query,
@@ -23,6 +25,7 @@ import {
     BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
+    RecordAnswerAcceptedDto,
     RecordAnswerDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
@@ -36,6 +39,7 @@ export class VocabularyController {
     constructor(private readonly vocabularyService: VocabularyService) {}
 
     @Post('word-progress/record-answer')
+    @HttpCode(HttpStatus.ACCEPTED)
     @ApiOperation({
         summary: 'Record an answer for a word',
         description:
@@ -43,14 +47,14 @@ export class VocabularyController {
     })
     @ApiBody({ type: RecordAnswerDto })
     @ApiResponse({
-        status: 200,
-        description: 'Answer recorded successfully',
-        type: WordProgressResponseDto,
+        status: 202,
+        description: 'Answer accepted for processing',
+        type: RecordAnswerAcceptedDto,
     })
     recordAnswer(
         @Req() req: Request & { user: JwtAuthPayload },
         @Body() body: RecordAnswerDto,
-    ): Promise<WordProgressResponseDto> {
+    ): Promise<RecordAnswerAcceptedDto> {
         return this.vocabularyService.recordAnswer(req.user.userLoginId, body);
     }
 

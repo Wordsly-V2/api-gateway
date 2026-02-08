@@ -1,10 +1,13 @@
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
+import { KafkaService } from '@/kafka/kafka.service';
+import { KAFKA_TOPICS } from '@/kafka/kafka-topics';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
     BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
+    RecordAnswerAcceptedDto,
     RecordAnswerDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
@@ -16,22 +19,21 @@ export class VocabularyService {
         @Inject('VOCABULARY_SERVICE_HTTP')
         private readonly vocabularyServiceHttp: AxiosInstance,
         private readonly errorHandlerService: ErrorHandlerService,
+        private readonly kafkaService: KafkaService,
     ) {}
 
     async recordAnswer(
         userLoginId: string,
         body: RecordAnswerDto,
-    ): Promise<WordProgressResponseDto> {
-        try {
-            const response =
-                await this.vocabularyServiceHttp.post<WordProgressResponseDto>(
-                    `/users/${userLoginId}/word-progress/record-answer`,
-                    body,
-                );
-            return response.data;
-        } catch (error) {
-            throw this.errorHandlerService.translateAxiosError(error);
-        }
+    ): Promise<RecordAnswerAcceptedDto> {
+        await this.kafkaService.sendMessage(
+            KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWER,
+            {
+                userLoginId,
+                ...body,
+            },
+        );
+        return { accepted: true };
     }
 
     async recordAnswers(

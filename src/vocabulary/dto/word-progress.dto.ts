@@ -39,6 +39,14 @@ export class RecordAnswerDto {
     quality: AnswerQuality;
 }
 
+export class RecordAnswerAcceptedDto {
+    @ApiProperty({
+        description: 'Request accepted for async processing',
+        example: true,
+    })
+    accepted: true;
+}
+
 export class BulkRecordAnswersDto {
     @ApiProperty({
         description: 'Array of word answers to record',
