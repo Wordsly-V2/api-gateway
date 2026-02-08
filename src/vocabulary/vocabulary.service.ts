@@ -7,7 +7,7 @@ import {
     GetDueWordsQueryDto,
     RecordAnswerDto,
     WordProgressResponseDto,
-    WordProgressStatsDto
+    WordProgressStatsDto,
 } from './dto/word-progress.dto';
 
 @Injectable()
@@ -47,7 +47,6 @@ export class VocabularyService {
             throw this.errorHandlerService.translateAxiosError(error);
         }
     }
-
 
     async getDueWordIds(
         userLoginId: string,
