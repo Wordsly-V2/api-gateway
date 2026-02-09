@@ -8,9 +8,6 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
 
-    // Required when behind a proxy (e.g. Render): so req.secure and redirect URLs are correct
-    app.set('trust proxy', 1);
-
     const frontendBaseUrls = (
         configService.get<string>('frontendBaseUrls') ?? ''
     ).split(',');
