@@ -120,15 +120,20 @@ export class AuthController {
         const sameSite = this.configService.get<string>(
             'refreshTokenCookieOptions.sameSite',
         );
-
+        const httpOnly = this.configService.get<boolean>(
+            'refreshTokenCookieOptions.httpOnly',
+        );
+        const path = this.configService.get<string>(
+            'refreshTokenCookieOptions.path',
+        );
         res.cookie('refresh_token', refreshToken, {
-            httpOnly: true,
+            httpOnly: httpOnly,
             secure: isSecure,
 
             // In production (e.g. Render): API and frontend are different origins,
             // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
             sameSite: sameSite as 'lax' | 'strict' | 'none',
-            path: '/auth',
+            path: path,
             maxAge: ms(refreshTokenExpiresIn),
         });
     }

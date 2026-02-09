@@ -39,6 +39,8 @@ export default () => ({
     // For Render (API and frontend on different origins): set REFRESH_TOKEN_COOKIE_SAME_SITE=none
     // (secure is forced to true when sameSite is 'none').
     refreshTokenCookieOptions: {
+        path: process.env.REFRESH_TOKEN_COOKIE_PATH ?? '/auth',
+        httpOnly: process.env.REFRESH_TOKEN_COOKIE_HTTP_ONLY === 'true',
         secure: process.env.REFRESH_TOKEN_COOKIE_SECURE === 'true',
         sameSite:
             (process.env.REFRESH_TOKEN_COOKIE_SAME_SITE as
