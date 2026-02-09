@@ -8,6 +8,9 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
 
+    const server = app.getHttpAdapter().getInstance();
+    server.set('trust proxy', 1);
+
     const frontendBaseUrls = (
         configService.get<string>('frontendBaseUrls') ?? ''
     ).split(',');
