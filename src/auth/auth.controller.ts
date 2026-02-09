@@ -106,8 +106,27 @@ export class AuthController {
             req.user,
             isLoggedOutFromAllDevices,
         );
-        res.clearCookie('refresh_token');
+        res.clearCookie('refresh_token', this.getRefreshTokenCookieOptions());
         return res.status(200).json({ message: 'Logged out successfully' });
+    }
+
+    private getRefreshTokenCookieOptions(): {
+        httpOnly: boolean;
+        secure: boolean;
+        sameSite: 'lax' | 'strict' | 'none';
+        path: string;
+        maxAge?: number;
+    } {
+        const isProduction =
+            this.configService.get<string>('nodeEnv') === 'production';
+        return {
+            httpOnly: true,
+            secure: isProduction,
+            // In production (e.g. Render): API and frontend are different origins,
+            // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
+            sameSite: isProduction ? 'none' : 'lax',
+            path: '/auth',
+        };
     }
 
     private setRefreshTokenCookie(res: Response, refreshToken: string) {
@@ -115,13 +134,12 @@ export class AuthController {
             'jwt.refreshTokenExpiresIn',
         ) as ms.StringValue;
 
-        res.clearCookie('refresh_token');
-        res.cookie('refresh_token', refreshToken, {
-            httpOnly: true,
-            secure: this.configService.get<string>('nodeEnv') === 'production',
-            sameSite: 'lax',
-            path: '/auth',
+        const options = {
+            ...this.getRefreshTokenCookieOptions(),
             maxAge: ms(refreshTokenExpiresIn),
-        });
+        };
+
+        res.clearCookie('refresh_token', options);
+        res.cookie('refresh_token', refreshToken, options);
     }
 }
