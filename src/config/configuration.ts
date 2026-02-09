@@ -36,6 +36,8 @@ export default () => ({
         cert: process.env.KAFKA_CERT ?? '',
         key: process.env.KAFKA_KEY ?? '',
     },
+    // For Render (API and frontend on different origins): set REFRESH_TOKEN_COOKIE_SAME_SITE=none
+    // (secure is forced to true when sameSite is 'none').
     refreshTokenCookieOptions: {
         secure: process.env.REFRESH_TOKEN_COOKIE_SECURE === 'true',
         sameSite:
