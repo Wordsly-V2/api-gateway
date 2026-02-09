@@ -36,4 +36,11 @@ export default () => ({
         cert: process.env.KAFKA_CERT ?? '',
         key: process.env.KAFKA_KEY ?? '',
     },
+    refreshTokenCookieOptions: {
+        secure: process.env.REFRESH_TOKEN_COOKIE_SECURE === 'true',
+        sameSite: process.env.REFRESH_TOKEN_COOKIE_SAME_SITE as
+            | 'lax'
+            | 'strict'
+            | 'none',
+    },
 });

@@ -117,14 +117,19 @@ export class AuthController {
         path: string;
         maxAge?: number;
     } {
-        const isProduction =
-            this.configService.get<string>('nodeEnv') === 'production';
+        const refreshTokenCookieOptions = this.configService.get<{
+            secure: boolean;
+            sameSite: 'lax' | 'strict' | 'none';
+        }>('refreshTokenCookieOptions') ?? {
+            secure: false,
+            sameSite: 'lax',
+        };
         return {
             httpOnly: true,
-            secure: isProduction,
+            secure: refreshTokenCookieOptions.secure,
             // In production (e.g. Render): API and frontend are different origins,
             // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
-            sameSite: isProduction ? 'none' : 'lax',
+            sameSite: refreshTokenCookieOptions.sameSite,
             path: '/auth',
         };
     }
