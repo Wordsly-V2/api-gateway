@@ -38,9 +38,10 @@ export default () => ({
     },
     refreshTokenCookieOptions: {
         secure: process.env.REFRESH_TOKEN_COOKIE_SECURE === 'true',
-        sameSite: process.env.REFRESH_TOKEN_COOKIE_SAME_SITE as
-            | 'lax'
-            | 'strict'
-            | 'none',
+        sameSite:
+            (process.env.REFRESH_TOKEN_COOKIE_SAME_SITE as
+                | 'lax'
+                | 'strict'
+                | 'none') ?? 'lax',
     },
 });

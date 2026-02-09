@@ -106,45 +106,30 @@ export class AuthController {
             req.user,
             isLoggedOutFromAllDevices,
         );
-        res.clearCookie('refresh_token', this.getRefreshTokenCookieOptions());
+        res.clearCookie('refresh_token');
         return res.status(200).json({ message: 'Logged out successfully' });
-    }
-
-    private getRefreshTokenCookieOptions(): {
-        httpOnly: boolean;
-        secure: boolean;
-        sameSite: 'lax' | 'strict' | 'none';
-        path: string;
-        maxAge?: number;
-    } {
-        const refreshTokenCookieOptions = this.configService.get<{
-            secure: boolean;
-            sameSite: 'lax' | 'strict' | 'none';
-        }>('refreshTokenCookieOptions') ?? {
-            secure: false,
-            sameSite: 'lax',
-        };
-        return {
-            httpOnly: true,
-            secure: refreshTokenCookieOptions.secure,
-            // In production (e.g. Render): API and frontend are different origins,
-            // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
-            sameSite: refreshTokenCookieOptions.sameSite,
-            path: '/auth',
-        };
     }
 
     private setRefreshTokenCookie(res: Response, refreshToken: string) {
         const refreshTokenExpiresIn = this.configService.get<string>(
             'jwt.refreshTokenExpiresIn',
         ) as ms.StringValue;
+        const isSecure = this.configService.get<boolean>(
+            'refreshTokenCookieOptions.secure',
+        );
+        const sameSite = this.configService.get<string>(
+            'refreshTokenCookieOptions.sameSite',
+        );
 
-        const options = {
-            ...this.getRefreshTokenCookieOptions(),
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: isSecure,
+
+            // In production (e.g. Render): API and frontend are different origins,
+            // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
+            sameSite: sameSite as 'lax' | 'strict' | 'none',
+            path: '/auth',
             maxAge: ms(refreshTokenExpiresIn),
-        };
-
-        res.clearCookie('refresh_token', options);
-        res.cookie('refresh_token', refreshToken, options);
+        });
     }
 }
