@@ -1,4 +1,4 @@
-import type { AnswerQuality } from '@/vocabulary/dto/word-progress.dto';
+import type { AnswerQuality } from '@/word-progress/dto/word-progress.dto';
 
 /**
  * Payload for topic: word-progress_record-answer

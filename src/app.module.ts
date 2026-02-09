@@ -8,10 +8,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
 import { ErrorHandlerModule } from './error-handler/error-handler.module';
 import { HttpClientsModule } from './http-clients/http-clients.module';
-import { VocabularyModule } from './vocabulary/vocabulary.module';
+import { WordProgressModule } from './word-progress/word-progress.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { WordsController } from './words/words.controller';
+import { WordsService } from './words/words.service';
+import { WordsModule } from './words/words.module';
 
 @Module({
     imports: [
@@ -42,12 +45,13 @@ import { KafkaModule } from './kafka/kafka.module';
         }),
         ErrorHandlerModule,
         HttpClientsModule,
-        VocabularyModule,
+        WordProgressModule,
         UsersModule,
         CoursesModule,
         KafkaModule,
+        WordsModule,
     ],
-    controllers: [AppController],
-    providers: [AppService, JwtAuthStrategy],
+    controllers: [AppController, WordsController],
+    providers: [AppService, JwtAuthStrategy, WordsService],
 })
 export class AppModule {}

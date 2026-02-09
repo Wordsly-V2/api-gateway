@@ -340,4 +340,15 @@ export class CoursesService {
             throw this.errorHandlerService.translateAxiosError(error);
         }
     }
+
+    async getPronunciation(word: string): Promise<string> {
+        try {
+            const response = await this.vocabularyServiceHttp.get<string>(
+                `words/pronunciation/${word}`,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
 }

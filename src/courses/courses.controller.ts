@@ -31,6 +31,11 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 export class CoursesController {
     constructor(private readonly coursesService: CoursesService) {}
 
+    @Get('pronunciation/:word')
+    getPronunciation(@Param('word') word: string): Promise<string> {
+        return this.coursesService.getPronunciation(word);
+    }
+
     @Get('/me/my-courses')
     myCourses(
         @Req() req: Request & { user: JwtAuthPayload },

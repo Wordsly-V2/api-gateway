@@ -29,15 +29,15 @@ import {
     WordProgressResponseDto,
     WordProgressStatsDto,
 } from './dto/word-progress.dto';
-import { VocabularyService } from './vocabulary.service';
+import { WordProgressService } from './word-progress.service';
 
-@ApiTags('vocabulary/word-progress')
-@Controller('vocabulary')
+@ApiTags('word-progress')
+@Controller('word-progress')
 @UseGuards(JwtAuthGuard)
-export class VocabularyController {
-    constructor(private readonly vocabularyService: VocabularyService) {}
+export class WordProgressController {
+    constructor(private readonly vocabularyService: WordProgressService) {}
 
-    @Post('word-progress/record-answer')
+    @Post('record-answer')
     @HttpCode(HttpStatus.ACCEPTED)
     @ApiOperation({
         summary: 'Record an answer for a word',
@@ -57,7 +57,7 @@ export class VocabularyController {
         return this.vocabularyService.recordAnswer(req.user.userLoginId, body);
     }
 
-    @Get('word-progress/due-word-ids')
+    @Get('due-word-ids')
     @ApiOperation({
         summary: 'Get IDs of words due for review',
         description:
@@ -110,7 +110,7 @@ export class VocabularyController {
         return wordIds;
     }
 
-    @Get('word-progress/stats')
+    @Get('stats')
     @ApiOperation({
         summary: 'Get learning progress statistics',
         description:
@@ -145,7 +145,7 @@ export class VocabularyController {
         );
     }
 
-    @Get('word-progress/words/:wordId')
+    @Get('words/:wordId')
     @ApiOperation({
         summary: 'Get progress for a specific word',
         description:
@@ -175,7 +175,7 @@ export class VocabularyController {
         );
     }
 
-    @Delete('word-progress/words/:wordId/reset')
+    @Delete('words/:wordId/reset')
     @ApiOperation({
         summary: 'Reset progress for a specific word',
         description:

@@ -14,7 +14,7 @@ import {
 } from './dto/word-progress.dto';
 
 @Injectable()
-export class VocabularyService {
+export class WordProgressService {
     constructor(
         @Inject('VOCABULARY_SERVICE_HTTP')
         private readonly vocabularyServiceHttp: AxiosInstance,
