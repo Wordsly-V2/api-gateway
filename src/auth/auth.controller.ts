@@ -106,49 +106,29 @@ export class AuthController {
             req.user,
             isLoggedOutFromAllDevices,
         );
-        res.clearCookie('refresh_token', this.getRefreshTokenCookieOptions());
+        res.clearCookie('refresh_token');
         return res.status(200).json({ message: 'Logged out successfully' });
-    }
-
-    /**
-     * Cookie options for refresh_token. When sameSite is 'none' (cross-origin on Render),
-     * secure must be true — browsers require it and ignore the cookie otherwise.
-     */
-    private getRefreshTokenCookieOptions(): {
-        httpOnly: boolean;
-        secure: boolean;
-        sameSite: 'lax' | 'strict' | 'none';
-        path: string;
-        maxAge?: number;
-    } {
-        let isSecure =
-            this.configService.get<boolean>(
-                'refreshTokenCookieOptions.secure',
-            ) ?? false;
-        const sameSite = this.configService.get<string>(
-            'refreshTokenCookieOptions.sameSite',
-        ) as 'lax' | 'strict' | 'none';
-
-        if (sameSite === 'none') {
-            isSecure = true;
-        }
-
-        return {
-            httpOnly: true,
-            secure: isSecure,
-            sameSite,
-            path: '/auth',
-        };
     }
 
     private setRefreshTokenCookie(res: Response, refreshToken: string) {
         const refreshTokenExpiresIn = this.configService.get<string>(
             'jwt.refreshTokenExpiresIn',
         ) as ms.StringValue;
-        const options = this.getRefreshTokenCookieOptions();
+        const isSecure = this.configService.get<boolean>(
+            'refreshTokenCookieOptions.secure',
+        );
+        const sameSite = this.configService.get<string>(
+            'refreshTokenCookieOptions.sameSite',
+        );
 
         res.cookie('refresh_token', refreshToken, {
-            ...options,
+            httpOnly: true,
+            secure: isSecure,
+
+            // In production (e.g. Render): API and frontend are different origins,
+            // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
+            sameSite: sameSite as 'lax' | 'strict' | 'none',
+            path: '/auth',
             maxAge: ms(refreshTokenExpiresIn),
         });
     }
