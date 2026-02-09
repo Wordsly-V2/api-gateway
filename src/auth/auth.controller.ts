@@ -65,7 +65,7 @@ export class AuthController {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const refreshToken = req.cookies['refresh_token'] as string;
         if (!refreshToken) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ message: 'Refresh token not found' });
         }
 
         try {
@@ -83,10 +83,10 @@ export class AuthController {
             this.setRefreshTokenCookie(res, newRefreshToken);
 
             return res.status(200).json({ accessToken: newAccessToken });
-
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({
+                message: 'HandleRefreshToken failed, error: ' + error,
+            });
         }
     }
 
