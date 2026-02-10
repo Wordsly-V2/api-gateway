@@ -8,15 +8,12 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
 
-    const server = app.getHttpAdapter().getInstance();
-    server.set('trust proxy', 1);
-
-    const frontendBaseUrls = (
-        configService.get<string>('frontendBaseUrls') ?? ''
+    const corsEnabledOrigins = (
+        configService.get<string>('corsEnabledOrigins') ?? ''
     ).split(',');
 
     app.enableCors({
-        origin: frontendBaseUrls,
+        origin: corsEnabledOrigins,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
@@ -34,6 +31,28 @@ async function bootstrap() {
     const appPort = configService.get<number>('port');
     await app.listen(appPort as number);
     console.log(`API Gateway is running on port ${appPort}`);
-    console.log(`Frontend base URLs: ${frontendBaseUrls.join(', ')}`);
+    console.log(`CORS enabled origins: ${corsEnabledOrigins.join(', ')}`);
+
+    const maxAge = configService.get<string>(
+        'refreshTokenCookieOptions.maxAge',
+    );
+    const isSecure = configService.get<boolean>(
+        'refreshTokenCookieOptions.secure',
+    );
+    const sameSite = configService.get<string>(
+        'refreshTokenCookieOptions.sameSite',
+    );
+    const httpOnly = configService.get<boolean>(
+        'refreshTokenCookieOptions.httpOnly',
+    );
+    const path = configService.get<string>('refreshTokenCookieOptions.path');
+
+    console.log('refresh token options', {
+        maxAge,
+        isSecure,
+        sameSite,
+        httpOnly,
+        path,
+    });
 }
 void bootstrap();

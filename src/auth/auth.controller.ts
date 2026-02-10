@@ -111,8 +111,8 @@ export class AuthController {
     }
 
     private setRefreshTokenCookie(res: Response, refreshToken: string) {
-        const refreshTokenExpiresIn = this.configService.get<string>(
-            'jwt.refreshTokenExpiresIn',
+        const maxAge = this.configService.get<string>(
+            'refreshTokenCookieOptions.maxAge',
         ) as ms.StringValue;
         const isSecure = this.configService.get<boolean>(
             'refreshTokenCookieOptions.secure',
@@ -129,12 +129,9 @@ export class AuthController {
         res.cookie('refresh_token', refreshToken, {
             httpOnly: httpOnly,
             secure: isSecure,
-
-            // In production (e.g. Render): API and frontend are different origins,
-            // so the browser only sends the cookie on cross-origin requests when sameSite is 'none'.
             sameSite: sameSite as 'lax' | 'strict' | 'none',
             path: path,
-            maxAge: ms(refreshTokenExpiresIn),
+            maxAge: ms(maxAge),
         });
     }
 }

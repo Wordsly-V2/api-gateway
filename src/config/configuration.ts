@@ -24,11 +24,11 @@ export default () => ({
             process.env.GOOGLE_FRONTEND_REDIRECT_URL ??
             'http://localhost:4000/auth/redirect',
     },
-    frontendBaseUrls: process.env.FRONTEND_BASE_URLS ?? 'http://localhost:4000',
+    corsEnabledOrigins:
+        process.env.CORS_ENABLED_ORIGINS ?? 'http://localhost:4000',
     jwt: {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
-        refreshTokenExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN ?? '30d',
     },
     kafka: {
         brokers: process.env.KAFKA_BROKERS ?? '',
@@ -42,6 +42,7 @@ export default () => ({
         path: process.env.REFRESH_TOKEN_COOKIE_PATH ?? '/auth',
         httpOnly: process.env.REFRESH_TOKEN_COOKIE_HTTP_ONLY === 'true',
         secure: process.env.REFRESH_TOKEN_COOKIE_SECURE === 'true',
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_MAX_AGE ?? '30d',
         sameSite:
             (process.env.REFRESH_TOKEN_COOKIE_SAME_SITE as
                 | 'lax'
