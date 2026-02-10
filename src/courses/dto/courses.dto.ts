@@ -94,6 +94,14 @@ export class CreateCourseLessonWordDto {
     @IsString()
     @IsOptional()
     audioUrl?: string;
+
+    @IsString()
+    @IsOptional()
+    imageUrl?: string;
+
+    @IsString()
+    @IsOptional()
+    example?: string;
 }
 
 export class ReorderLessonsDto {
