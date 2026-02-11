@@ -12,9 +12,9 @@ import { WordProgressModule } from './word-progress/word-progress.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { KafkaModule } from './kafka/kafka.module';
-import { WordsController } from './words/words.controller';
-import { WordsService } from './words/words.service';
-import { WordsModule } from './words/words.module';
+import { DictionaryController } from './dictionary/dictionary.controller';
+import { DictionaryService } from './dictionary/dictionary.service';
+import { DictionaryModule } from './dictionary/dictionary.module';
 
 @Module({
     imports: [
@@ -49,9 +49,9 @@ import { WordsModule } from './words/words.module';
         UsersModule,
         CoursesModule,
         KafkaModule,
-        WordsModule,
+        DictionaryModule,
     ],
-    controllers: [AppController, WordsController],
-    providers: [AppService, JwtAuthStrategy, WordsService],
+    controllers: [AppController, DictionaryController],
+    providers: [AppService, JwtAuthStrategy, DictionaryService],
 })
 export class AppModule {}
