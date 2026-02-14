@@ -32,4 +32,15 @@ export class DictionaryService {
             throw this.errorHandlerService.translateAxiosError(error);
         }
     }
+
+    async getExamples(word: string): Promise<string[]> {
+        try {
+            const response = await this.vocabularyServiceHttp.get<string[]>(
+                `/dictionary/examples/${word}`,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
 }

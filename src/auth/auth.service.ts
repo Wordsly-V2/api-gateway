@@ -2,6 +2,8 @@ import { JwtAuthPayload, LoginResponse, OAuthUser } from '@/auth/dto/auth.dto';
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
+import { ConfigService } from '@nestjs/config';
+import ms from 'ms';
 
 @Injectable()
 export class AuthService {
@@ -9,6 +11,7 @@ export class AuthService {
         @Inject('AUTH_SERVICE_HTTP')
         private readonly authServiceHttp: AxiosInstance,
         private readonly errorHandlerService: ErrorHandlerService,
+        private readonly configService: ConfigService,
     ) {}
 
     async handleOAuthLogin(
@@ -59,5 +62,37 @@ export class AuthService {
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
         }
+    }
+
+    getRefreshTokenCookieOptions(): {
+        maxAge: ms.StringValue;
+        isSecure: boolean;
+        sameSite: 'lax' | 'strict' | 'none';
+        httpOnly: boolean;
+        path: string;
+    } {
+        const maxAge = this.configService.get<string>(
+            'refreshTokenCookieOptions.maxAge',
+        ) as ms.StringValue;
+        const isSecure = this.configService.get<boolean>(
+            'refreshTokenCookieOptions.secure',
+        ) as boolean;
+        const sameSite = this.configService.get<string>(
+            'refreshTokenCookieOptions.sameSite',
+        ) as 'lax' | 'strict' | 'none';
+        const httpOnly = this.configService.get<boolean>(
+            'refreshTokenCookieOptions.httpOnly',
+        ) as boolean;
+        const path = this.configService.get<string>(
+            'refreshTokenCookieOptions.path',
+        ) as string;
+
+        return {
+            maxAge,
+            isSecure,
+            sameSite,
+            httpOnly,
+            path,
+        };
     }
 }

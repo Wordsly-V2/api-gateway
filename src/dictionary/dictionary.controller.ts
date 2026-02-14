@@ -54,4 +54,17 @@ export class DictionaryController {
     ): Promise<DictionarySearchResultDto[]> {
         return this.dictionaryService.searchWords(word);
     }
+
+    @Get('examples/:word')
+    @ApiOperation({
+        summary: 'Get examples for a word',
+        description: 'Gets the examples for a word',
+    })
+    @ApiParam({
+        name: 'word',
+        description: 'Word to get examples for',
+    })
+    getExamples(@Param('word') word: string): Promise<string[]> {
+        return this.dictionaryService.getExamples(word);
+    }
 }

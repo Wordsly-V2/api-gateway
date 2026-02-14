@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@/app.module';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { AuthService } from './auth/auth.service';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -33,26 +34,9 @@ async function bootstrap() {
     console.log(`API Gateway is running on port ${appPort}`);
     console.log(`CORS enabled origins: ${corsEnabledOrigins.join(', ')}`);
 
-    const maxAge = configService.get<string>(
-        'refreshTokenCookieOptions.maxAge',
+    console.log(
+        'refresh token options',
+        app.get(AuthService).getRefreshTokenCookieOptions(),
     );
-    const isSecure = configService.get<boolean>(
-        'refreshTokenCookieOptions.secure',
-    );
-    const sameSite = configService.get<string>(
-        'refreshTokenCookieOptions.sameSite',
-    );
-    const httpOnly = configService.get<boolean>(
-        'refreshTokenCookieOptions.httpOnly',
-    );
-    const path = configService.get<string>('refreshTokenCookieOptions.path');
-
-    console.log('refresh token options', {
-        maxAge,
-        isSecure,
-        sameSite,
-        httpOnly,
-        path,
-    });
 }
 void bootstrap();

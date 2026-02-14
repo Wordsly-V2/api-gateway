@@ -15,7 +15,4 @@ export class DictionarySearchResultDto {
         example: 'https://cdn.langeek.co/photo/48239/original/?type=jpeg',
     })
     imageUrl: string;
-
-    @ApiProperty({ example: 'We need to accumulate the money.' })
-    examples: string[];
 }

@@ -111,25 +111,13 @@ export class AuthController {
     }
 
     private setRefreshTokenCookie(res: Response, refreshToken: string) {
-        const maxAge = this.configService.get<string>(
-            'refreshTokenCookieOptions.maxAge',
-        ) as ms.StringValue;
-        const isSecure = this.configService.get<boolean>(
-            'refreshTokenCookieOptions.secure',
-        );
-        const sameSite = this.configService.get<string>(
-            'refreshTokenCookieOptions.sameSite',
-        );
-        const httpOnly = this.configService.get<boolean>(
-            'refreshTokenCookieOptions.httpOnly',
-        );
-        const path = this.configService.get<string>(
-            'refreshTokenCookieOptions.path',
-        );
+        const { maxAge, isSecure, sameSite, httpOnly, path } =
+            this.authService.getRefreshTokenCookieOptions();
+
         res.cookie('refresh_token', refreshToken, {
             httpOnly: httpOnly,
             secure: isSecure,
-            sameSite: sameSite as 'lax' | 'strict' | 'none',
+            sameSite: sameSite,
             path: path,
             maxAge: ms(maxAge),
         });
