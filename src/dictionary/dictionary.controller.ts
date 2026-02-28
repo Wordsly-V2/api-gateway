@@ -1,8 +1,9 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { DictionaryService } from './dictionary.service';
 import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
 import { DictionarySearchResultDto } from './dto/dctionary.dto';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthPayload } from '@/auth/dto/auth.dto';
 
 @Controller('dictionary')
 @UseGuards(JwtAuthGuard)
@@ -66,5 +67,24 @@ export class DictionaryController {
     })
     getExamples(@Param('word') word: string): Promise<string[]> {
         return this.dictionaryService.getExamples(word);
+    }
+
+    @Get('my-words/search/:word')
+    @ApiOperation({
+        summary: 'Get examples for a word',
+        description: 'Gets the examples for a word',
+    })
+    @ApiParam({
+        name: 'word',
+        description: 'Word to get examples for',
+    })
+    searchUserWords(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('word') word: string,
+    ): Promise<string[]> {
+        return this.dictionaryService.searchUserWords(
+            req.user.userLoginId,
+            word,
+        );
     }
 }

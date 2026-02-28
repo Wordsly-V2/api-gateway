@@ -43,4 +43,18 @@ export class DictionaryService {
             throw this.errorHandlerService.translateAxiosError(error);
         }
     }
+
+    async searchUserWords(
+        userLoginId: string,
+        word: string,
+    ): Promise<string[]> {
+        try {
+            const response = await this.vocabularyServiceHttp.get<string[]>(
+                `dictionary/users/${userLoginId}/words/search/${word}`,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
 }
