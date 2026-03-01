@@ -293,6 +293,33 @@ export class CoursesController {
         );
     }
 
+    @Delete('/me/my-courses/:courseId/words/bulk-delete')
+    deleteWordsBulkFromCourse(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId', new ParseUUIDPipe()) courseId: string,
+        @Body() body: { wordIds: string[] },
+    ): Promise<{ count: number }> {
+        return this.coursesService.deleteWordsBulkFromCourse(
+            req.user.userLoginId,
+            courseId,
+            body.wordIds ?? [],
+        );
+    }
+
+    @Put('/me/my-courses/:courseId/words/bulk-move')
+    moveWordsBulkFromCourse(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId', new ParseUUIDPipe()) courseId: string,
+        @Body() body: { wordIds: string[]; targetLessonId: string },
+    ): Promise<{ count: number }> {
+        return this.coursesService.moveWordsBulkFromCourse(
+            req.user.userLoginId,
+            courseId,
+            body.wordIds ?? [],
+            body.targetLessonId,
+        );
+    }
+
     @Get('/me/my-courses/:courseId/words')
     getWordsByIds(
         @Req() req: Request & { user: JwtAuthPayload },

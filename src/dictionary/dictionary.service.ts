@@ -11,11 +11,15 @@ export class DictionaryService {
         private readonly errorHandlerService: ErrorHandlerService,
     ) {}
 
-    async getPronunciation(word: string): Promise<string> {
+    async getPronunciation(word: string): Promise<{
+        pronunciation: { type: string; url: string }[];
+        ipas: { partOfSpeech: string; uk: string | null; us: string | null }[];
+    }> {
         try {
-            const response = await this.vocabularyServiceHttp.get<string>(
-                `/dictionary/pronunciation/${word}`,
-            );
+            const response = await this.vocabularyServiceHttp.get<{
+                pronunciation: { type: string; url: string }[];
+                ipas: { partOfSpeech: string; uk: string | null; us: string | null }[];
+            }>(`/dictionary/pronunciation/${encodeURIComponent(word)}`);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

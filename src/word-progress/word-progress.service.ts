@@ -5,6 +5,7 @@ import { KafkaService } from '@/kafka/kafka.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
+    BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
     RecordAnswerAcceptedDto,
@@ -34,6 +35,27 @@ export class WordProgressService {
             KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWER,
             payload,
         );
+        return { accepted: true };
+    }
+
+    /**
+     * Record multiple answers in one request. Each answer is published to Kafka for async processing.
+     */
+    async recordAnswerBulk(
+        userLoginId: string,
+        body: BulkRecordAnswersDto,
+    ): Promise<RecordAnswerAcceptedDto> {
+        for (const answer of body.answers) {
+            const payload: WordProgressRecordAnswerPayload = {
+                userLoginId,
+                wordId: answer.wordId,
+                quality: answer.quality,
+            };
+            await this.kafkaService.sendMessage(
+                KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWER,
+                payload,
+            );
+        }
         return { accepted: true };
     }
 
@@ -102,6 +124,22 @@ export class WordProgressService {
             const response = await this.vocabularyServiceHttp.delete<{
                 success: boolean;
             }>(`/users/${userLoginId}/word-progress/words/${wordId}/reset`);
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async resetProgressBulk(
+        userLoginId: string,
+        wordIds: string[],
+    ): Promise<{ count: number }> {
+        try {
+            const response = await this.vocabularyServiceHttp.delete<{
+                count: number;
+            }>(`/users/${userLoginId}/word-progress/words/bulk-reset`, {
+                data: { wordIds },
+            });
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

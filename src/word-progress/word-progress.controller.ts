@@ -22,6 +22,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import {
+    BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
     RecordAnswerAcceptedDto,
@@ -55,6 +56,29 @@ export class WordProgressController {
         @Body() body: RecordAnswerDto,
     ): Promise<RecordAnswerAcceptedDto> {
         return this.vocabularyService.recordAnswer(req.user.userLoginId, body);
+    }
+
+    @Post('record-answer/bulk')
+    @HttpCode(HttpStatus.ACCEPTED)
+    @ApiOperation({
+        summary: 'Record multiple answers (bulk)',
+        description:
+            'Records multiple word answers in one request. Each is processed asynchronously.',
+    })
+    @ApiBody({ type: BulkRecordAnswersDto })
+    @ApiResponse({
+        status: 202,
+        description: 'Answers accepted for processing',
+        type: RecordAnswerAcceptedDto,
+    })
+    recordAnswerBulk(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: BulkRecordAnswersDto,
+    ): Promise<RecordAnswerAcceptedDto> {
+        return this.vocabularyService.recordAnswerBulk(
+            req.user.userLoginId,
+            body,
+        );
     }
 
     @Get('due-word-ids')
@@ -172,6 +196,34 @@ export class WordProgressController {
         return this.vocabularyService.getWordProgress(
             req.user.userLoginId,
             wordId,
+        );
+    }
+
+    @Delete('words/bulk-reset')
+    @ApiOperation({
+        summary: 'Reset progress for multiple words (bulk)',
+        description:
+            'Deletes learning progress for the given word IDs. Only words in the user\'s courses are reset.',
+    })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ['wordIds'],
+            properties: { wordIds: { type: 'array', items: { type: 'string', format: 'uuid' } } },
+        },
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Progress reset; returns count of reset items',
+        schema: { type: 'object', properties: { count: { type: 'number' } } },
+    })
+    resetProgressBulk(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: { wordIds: string[] },
+    ): Promise<{ count: number }> {
+        return this.vocabularyService.resetProgressBulk(
+            req.user.userLoginId,
+            body.wordIds ?? [],
         );
     }
 

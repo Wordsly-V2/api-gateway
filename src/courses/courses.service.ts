@@ -195,15 +195,19 @@ export class CoursesService {
         courseId: string,
         lessonId: string,
         words: CreateCourseLessonWordDto[],
-    ): Promise<{ success: boolean }> {
+    ): Promise<{ success: boolean; count?: number }> {
         try {
             const response = await this.vocabularyServiceHttp.post<{
-                success: boolean;
+                success?: boolean;
+                count?: number;
             }>(
                 `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/bulk`,
-                words,
+                { words },
             );
-            return response.data;
+            return {
+                success: true,
+                count: response.data.count ?? words.length,
+            };
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
         }
@@ -300,6 +304,42 @@ export class CoursesService {
                 `/users/${userLoginId}/courses/${courseId}/lessons/${lessonId}/words/bulk-delete`,
                 { data: { wordIds } },
             );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async deleteWordsBulkFromCourse(
+        userLoginId: string,
+        courseId: string,
+        wordIds: string[],
+    ): Promise<{ count: number }> {
+        try {
+            const response = await this.vocabularyServiceHttp.delete<{
+                count: number;
+            }>(`/users/${userLoginId}/courses/${courseId}/words/bulk-delete`, {
+                data: { wordIds },
+            });
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async moveWordsBulkFromCourse(
+        userLoginId: string,
+        courseId: string,
+        wordIds: string[],
+        targetLessonId: string,
+    ): Promise<{ count: number }> {
+        try {
+            const response = await this.vocabularyServiceHttp.put<{
+                count: number;
+            }>(`/users/${userLoginId}/courses/${courseId}/words/bulk-move`, {
+                wordIds,
+                targetLessonId,
+            });
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

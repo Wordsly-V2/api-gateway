@@ -12,8 +12,8 @@ export class DictionaryController {
 
     @Get('pronunciation/:word')
     @ApiOperation({
-        summary: 'Get pronunciation for a word',
-        description: 'Gets the pronunciation for a word',
+        summary: 'Get pronunciation and IPA for a word',
+        description: 'Gets pronunciation (audio URLs) and UK/US IPA for a word',
     })
     @ApiParam({
         name: 'word',
@@ -21,14 +21,12 @@ export class DictionaryController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Pronunciation retrieved successfully',
-        type: String,
+        description: 'Pronunciation and IPA data',
     })
-    @ApiResponse({
-        status: 400,
-        description: 'Invalid word format',
-    })
-    getPronunciation(@Param('word') word: string): Promise<string> {
+    getPronunciation(@Param('word') word: string): Promise<{
+        pronunciation: { type: string; url: string }[];
+        ipas: { partOfSpeech: string; uk: string | null; us: string | null }[];
+    }> {
         return this.dictionaryService.getPronunciation(word);
     }
 
