@@ -1,5 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/** Structured word details from vocabulary-service GET word-details. */
+export class LangeekWordDetailsDto {
+    @ApiProperty()
+    word: string;
+
+    @ApiProperty()
+    meaning: string;
+
+    @ApiProperty()
+    partOfSpeech: string;
+
+    @ApiProperty()
+    pronunciation: string;
+
+    @ApiProperty()
+    audioUrl: string;
+
+    @ApiProperty({ type: [String] })
+    examples: string[];
+}
+
 export class DictionarySearchResultDto {
     @ApiProperty({ example: 'accumulate' })
     word: string;

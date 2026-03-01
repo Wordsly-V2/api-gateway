@@ -1,9 +1,20 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
-import { DictionaryService } from './dictionary.service';
-import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
-import { DictionarySearchResultDto } from './dto/dctionary.dto';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthPayload } from '@/auth/dto/auth.dto';
+import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
+import {
+    Controller,
+    Get,
+    Param,
+    ParseIntPipe,
+    Query,
+    Req,
+    UseGuards,
+} from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { DictionaryService } from './dictionary.service';
+import {
+    DictionarySearchResultDto,
+    LangeekWordDetailsDto,
+} from './dto/dctionary.dto';
 
 @Controller('dictionary')
 @UseGuards(JwtAuthGuard)
@@ -52,6 +63,43 @@ export class DictionaryController {
         @Param('word') word: string,
     ): Promise<DictionarySearchResultDto[]> {
         return this.dictionaryService.searchWords(word);
+    }
+
+    @Get('word-details/:langeekWordId')
+    @ApiOperation({
+        summary: 'Get word details from Langeek dictionary',
+        description:
+            'Fetches full word details from dictionary.langeek.co using the word ID from search results.',
+    })
+    @ApiParam({
+        name: 'langeekWordId',
+        description: 'Langeek word entry ID (from search results)',
+        example: 2707,
+    })
+    @ApiQuery({
+        name: 'entry',
+        description:
+            'Word text (e.g. from search result), required for the Langeek URL',
+        example: 'admire',
+    })
+    @ApiResponse({
+        status: 200,
+        description:
+            'Structured word details (word, meaning, partOfSpeech, pronunciation, audioUrl, examples)',
+        type: LangeekWordDetailsDto,
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Word details not found',
+    })
+    async getLangeekWordDetails(
+        @Param('langeekWordId', new ParseIntPipe()) langeekWordId: number,
+        @Query('entry') entry: string,
+    ) {
+        return this.dictionaryService.getLangeekWordDetails(
+            langeekWordId,
+            entry ?? '',
+        );
     }
 
     @Get('examples/:word')
