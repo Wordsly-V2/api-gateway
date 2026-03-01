@@ -67,7 +67,7 @@ export class DictionaryController {
         return this.dictionaryService.searchWords(word);
     }
 
-    @Get('word-details/:langeekWordId')
+    @Get('word-details/:langeekWordId/:partOfSpeech')
     @ApiOperation({
         summary: 'Get word details from Langeek dictionary',
         description:
@@ -79,10 +79,10 @@ export class DictionaryController {
         example: 2707,
     })
     @ApiQuery({
-        name: 'entry',
+        name: 'partOfSpeech',
         description:
-            'Word text (e.g. from search result), required for the Langeek URL',
-        example: 'admire',
+            'Part of speech to select (e.g. adjective, noun, verb) when the word has multiple senses.',
+        example: 'adjective',
     })
     @ApiResponse({
         status: 200,
@@ -96,8 +96,12 @@ export class DictionaryController {
     })
     async getLangeekWordDetails(
         @Param('langeekWordId', new ParseIntPipe()) langeekWordId: number,
+        @Param('partOfSpeech') partOfSpeech: string,
     ) {
-        return this.dictionaryService.getLangeekWordDetails(langeekWordId);
+        return this.dictionaryService.getLangeekWordDetails(
+            langeekWordId,
+            partOfSpeech,
+        );
     }
 
     @Get('examples/:word')

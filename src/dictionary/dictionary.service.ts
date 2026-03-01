@@ -49,11 +49,12 @@ export class DictionaryService {
 
     async getLangeekWordDetails(
         langeekWordId: number,
+        partOfSpeech: string,
     ): Promise<LangeekWordDetailsDto | null> {
         try {
             const response =
                 await this.vocabularyServiceHttp.get<LangeekWordDetailsDto | null>(
-                    `/dictionary/word-details/${langeekWordId}`,
+                    `/dictionary/word-details/${langeekWordId}/${partOfSpeech}`,
                 );
             return response.data;
         } catch (error) {
