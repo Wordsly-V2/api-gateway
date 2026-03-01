@@ -1,4 +1,6 @@
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
+import { KAFKA_TOPICS } from '@/kafka/kafka-topics';
+import { KafkaService } from '@/kafka/kafka.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
@@ -12,6 +14,7 @@ export class DictionaryService {
         @Inject('VOCABULARY_SERVICE_HTTP')
         private readonly vocabularyServiceHttp: AxiosInstance,
         private readonly errorHandlerService: ErrorHandlerService,
+        private readonly kafkaService: KafkaService,
     ) {}
 
     async getPronunciation(word: string): Promise<{
@@ -46,13 +49,11 @@ export class DictionaryService {
 
     async getLangeekWordDetails(
         langeekWordId: number,
-        entry: string,
     ): Promise<LangeekWordDetailsDto | null> {
         try {
-            const params = new URLSearchParams({ entry: entry.trim() });
             const response =
                 await this.vocabularyServiceHttp.get<LangeekWordDetailsDto | null>(
-                    `/dictionary/word-details/${langeekWordId}?${params}`,
+                    `/dictionary/word-details/${langeekWordId}`,
                 );
             return response.data;
         } catch (error) {
@@ -80,6 +81,52 @@ export class DictionaryService {
                 `dictionary/users/${userLoginId}/words/search/${word}`,
             );
             return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async syncWordsWithLangeek(filters?: {
+        userId?: string;
+        courseId?: string;
+        lessonId?: string;
+        wordId?: string;
+    }): Promise<{ total: number; enqueued: number }> {
+        try {
+            let totalEnqueued = 0;
+            let cursor: string | undefined;
+
+            do {
+                const { data } = await this.vocabularyServiceHttp.post<{
+                    words: {
+                        wordId: string;
+                        word: string;
+                        partOfSpeech: string | null;
+                    }[];
+                    nextCursor: string | null;
+                }>('/dictionary/sync-words-langeek/words', {
+                    ...(filters ?? {}),
+                    cursor,
+                    limit: 500,
+                });
+                const words = data?.words ?? [];
+                const nextCursor = data?.nextCursor ?? null;
+
+                if (words.length > 0) {
+                    await this.kafkaService.sendBatch(
+                        KAFKA_TOPICS.DICTIONARY_SYNC_WORD_LANGEEK,
+                        words.map((w) => ({
+                            wordId: w.wordId,
+                            word: w.word,
+                            partOfSpeech: w.partOfSpeech,
+                        })),
+                    );
+                    totalEnqueued += words.length;
+                }
+                cursor = nextCursor ?? undefined;
+            } while (cursor);
+
+            return { total: totalEnqueued, enqueued: totalEnqueued };
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
         }

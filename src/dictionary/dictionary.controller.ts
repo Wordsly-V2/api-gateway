@@ -1,11 +1,12 @@
 import { JwtAuthPayload } from '@/auth/dto/auth.dto';
 import { JwtAuthGuard } from '@/common/guard/jwt-auth/jwt-auth.guard';
 import {
+    Body,
     Controller,
     Get,
     Param,
     ParseIntPipe,
-    Query,
+    Post,
     Req,
     UseGuards,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { DictionaryService } from './dictionary.service';
 import {
     DictionarySearchResultDto,
     LangeekWordDetailsDto,
+    SyncWordsLangeekDto,
 } from './dto/dctionary.dto';
 
 @Controller('dictionary')
@@ -94,12 +96,8 @@ export class DictionaryController {
     })
     async getLangeekWordDetails(
         @Param('langeekWordId', new ParseIntPipe()) langeekWordId: number,
-        @Query('entry') entry: string,
     ) {
-        return this.dictionaryService.getLangeekWordDetails(
-            langeekWordId,
-            entry ?? '',
-        );
+        return this.dictionaryService.getLangeekWordDetails(langeekWordId);
     }
 
     @Get('examples/:word')
@@ -132,5 +130,28 @@ export class DictionaryController {
             req.user.userLoginId,
             word,
         );
+    }
+
+    @Post('sync-words-langeek')
+    @ApiOperation({
+        summary: 'Sync words with Langeek',
+        description:
+            'Gets the list of words from vocabulary-service, then produces one Kafka message per word. Vocabulary-service consumes and processes each message (Langeek lookup + DB update).',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Number of words enqueued (total, enqueued)',
+    })
+    async syncWordsWithLangeek(@Body() dto: SyncWordsLangeekDto) {
+        const filters =
+            dto.userId || dto.courseId || dto.lessonId || dto.wordId
+                ? {
+                      userId: dto.userId,
+                      courseId: dto.courseId,
+                      lessonId: dto.lessonId,
+                      wordId: dto.wordId,
+                  }
+                : undefined;
+        return this.dictionaryService.syncWordsWithLangeek(filters);
     }
 }

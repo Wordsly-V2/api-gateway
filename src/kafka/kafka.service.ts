@@ -59,6 +59,24 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     }
 
     /**
+     * Send multiple messages to a topic in one batch.
+     */
+    async sendBatch(
+        topic: string,
+        messages: unknown[],
+    ): Promise<RecordMetadata[]> {
+        this.ensureProducer();
+        if (messages.length === 0) return [];
+        const serialized = messages.map((m) =>
+            typeof m === 'string' ? m : JSON.stringify(m),
+        );
+        return this.producer!.send({
+            topic,
+            messages: serialized.map((value) => ({ value })),
+        });
+    }
+
+    /**
      * Emit a message with full options (topic, payload, key, headers).
      * Use this when you need partitioning key or headers.
      */
