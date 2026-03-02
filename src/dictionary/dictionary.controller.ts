@@ -5,7 +5,6 @@ import {
     Controller,
     Get,
     Param,
-    ParseIntPipe,
     Post,
     Req,
     UseGuards,
@@ -67,16 +66,16 @@ export class DictionaryController {
         return this.dictionaryService.searchWords(word);
     }
 
-    @Get('word-details/:langeekWordId/:partOfSpeech')
+    @Get('word-details/:word/:partOfSpeech')
     @ApiOperation({
         summary: 'Get word details from Langeek dictionary',
         description:
             'Fetches full word details from dictionary.langeek.co using the word ID from search results.',
     })
     @ApiParam({
-        name: 'langeekWordId',
-        description: 'Langeek word entry ID (from search results)',
-        example: 2707,
+        name: 'word',
+        description: 'Word to get details for',
+        example: 'hello',
     })
     @ApiQuery({
         name: 'partOfSpeech',
@@ -95,13 +94,10 @@ export class DictionaryController {
         description: 'Word details not found',
     })
     async getLangeekWordDetails(
-        @Param('langeekWordId', new ParseIntPipe()) langeekWordId: number,
+        @Param('word') word: string,
         @Param('partOfSpeech') partOfSpeech: string,
     ) {
-        return this.dictionaryService.getLangeekWordDetails(
-            langeekWordId,
-            partOfSpeech,
-        );
+        return this.dictionaryService.getLangeekWordDetails(word, partOfSpeech);
     }
 
     @Get('examples/:word')
