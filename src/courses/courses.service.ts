@@ -75,6 +75,20 @@ export class CoursesService {
         }
     }
 
+    async getLessonsByCourseId(
+        userLoginId: string,
+        courseId: string,
+    ): Promise<Array<{ id: string; name: string; wordsCount: number }>> {
+        try {
+            const response = await this.vocabularyServiceHttp.get<
+                Array<{ id: string; name: string; wordsCount: number }>
+            >(`/users/${userLoginId}/courses/${courseId}/lessons`);
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
     async deleteMyCourse(
         userLoginId: string,
         courseId: string,

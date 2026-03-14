@@ -92,6 +92,17 @@ export class CoursesController {
         );
     }
 
+    @Get('/me/my-courses/:courseId/lessons')
+    getLessonsByCourseId(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('courseId', new ParseUUIDPipe()) courseId: string,
+    ): Promise<Array<{ id: string; name: string; wordsCount: number }>> {
+        return this.coursesService.getLessonsByCourseId(
+            req.user.userLoginId,
+            courseId,
+        );
+    }
+
     @Put('/me/my-courses/:courseId')
     updateMyCourse(
         @Req() req: Request & { user: JwtAuthPayload },
