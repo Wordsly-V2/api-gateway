@@ -4,6 +4,7 @@ import {
     Body,
     Controller,
     Get,
+    Patch,
     Post,
     Query,
     Req,
@@ -19,6 +20,7 @@ import {
     DailyHabitQueryDto,
     DailyHabitResponseDto,
     RecordDailyPracticeDto,
+    UpdateDailyGoalDto,
 } from './dto/daily-habit.dto';
 import { DailyHabitService } from './daily-habit.service';
 
@@ -68,6 +70,28 @@ export class DailyHabitController {
         return this.dailyHabitService.recordPractice(
             req.user.userLoginId,
             body,
+        );
+    }
+
+    @Patch('goal')
+    @ApiOperation({
+        summary: 'Update daily word goal',
+    })
+    @ApiBody({ type: UpdateDailyGoalDto })
+    @ApiResponse({
+        status: 200,
+        description: 'Daily goal updated successfully',
+        type: DailyHabitResponseDto,
+    })
+    updateDailyGoal(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: UpdateDailyGoalDto,
+        @Query() query: DailyHabitQueryDto,
+    ): Promise<DailyHabitResponseDto> {
+        return this.dailyHabitService.updateDailyGoal(
+            req.user.userLoginId,
+            body,
+            query.clientDate,
         );
     }
 }
