@@ -23,10 +23,16 @@ import {
 } from '@nestjs/swagger';
 import {
     BulkRecordAnswersDto,
+    ByCourseIdsDto,
+    ByLessonIdsDto,
+    ByWordIdsDto,
     DueWordIdsResponseDto,
+    GetDueWordIdsByWordIdsDto,
     GetDueWordsQueryDto,
     RecordAnswerAcceptedDto,
     RecordAnswerDto,
+    StatsByScopesDto,
+    StatsByWordIdsDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
 } from './dto/word-progress.dto';
@@ -132,6 +138,98 @@ export class WordProgressController {
             query,
         );
         return wordIds;
+    }
+
+    @Post('stats')
+    @ApiOperation({
+        summary: 'Get progress stats for word IDs',
+    })
+    @ApiBody({ type: StatsByWordIdsDto })
+    getProgressStatsByWordIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: StatsByWordIdsDto,
+    ): Promise<WordProgressStatsDto> {
+        return this.vocabularyService.getProgressStatsByWordIds(
+            req.user.userLoginId,
+            body.wordIds,
+        );
+    }
+
+    @Post('stats/by-scopes')
+    @ApiOperation({
+        summary: 'Get progress stats keyed by scope ID',
+    })
+    @ApiBody({ type: StatsByScopesDto })
+    getProgressStatsByScopes(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: StatsByScopesDto,
+    ): Promise<Record<string, WordProgressStatsDto>> {
+        return this.vocabularyService.getProgressStatsByScopes(
+            req.user.userLoginId,
+            body.scopes,
+        );
+    }
+
+    @Post('due-word-ids/by-word-ids')
+    @ApiOperation({
+        summary: 'Get due word IDs within a provided word ID list',
+    })
+    @ApiBody({ type: GetDueWordIdsByWordIdsDto })
+    getDueWordIdsByWordIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: GetDueWordIdsByWordIdsDto,
+    ): Promise<DueWordIdsResponseDto> {
+        return this.vocabularyService.getDueWordIdsByWordIds(
+            req.user.userLoginId,
+            body.wordIds,
+            body.limit,
+            body.includeNew,
+        );
+    }
+
+    @Post('stats/by-course-ids')
+    @ApiOperation({
+        summary: 'Get progress stats keyed by course ID',
+    })
+    @ApiBody({ type: ByCourseIdsDto })
+    getProgressStatsByCourseIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: ByCourseIdsDto,
+    ): Promise<Record<string, WordProgressStatsDto>> {
+        return this.vocabularyService.getProgressStatsByCourseIds(
+            req.user.userLoginId,
+            body.courseIds,
+        );
+    }
+
+    @Post('stats/by-lesson-ids')
+    @ApiOperation({
+        summary: 'Get progress stats keyed by lesson ID',
+    })
+    @ApiBody({ type: ByLessonIdsDto })
+    getProgressStatsByLessonIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: ByLessonIdsDto,
+    ): Promise<Record<string, WordProgressStatsDto>> {
+        return this.vocabularyService.getProgressStatsByLessonIds(
+            req.user.userLoginId,
+            body.lessonIds,
+        );
+    }
+
+    @Post('by-word-ids')
+    @ApiOperation({
+        summary: 'Get progress keyed by word ID',
+    })
+    @ApiBody({ type: ByWordIdsDto })
+    getProgressByWordIds(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: ByWordIdsDto,
+    ): Promise<Record<string, WordProgressResponseDto | null>> {
+        return this.vocabularyService.getProgressByWordIds(
+            req.user.userLoginId,
+            body.wordIds,
+        );
     }
 
     @Get('stats')

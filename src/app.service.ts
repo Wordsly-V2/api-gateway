@@ -14,6 +14,8 @@ export class AppService {
         private readonly authServiceHttp: AxiosInstance,
         @Inject('VOCABULARY_SERVICE_HTTP')
         private readonly vocabularyServiceHttp: AxiosInstance,
+        @Inject('LEARNING_SERVICE_HTTP')
+        private readonly learningServiceHttp: AxiosInstance,
     ) {}
 
     private async getAuthServiceHealth(): Promise<ServiceHealth> {
@@ -53,10 +55,30 @@ export class AppService {
         }
     }
 
+    private async getLearningServiceHealth(): Promise<ServiceHealth> {
+        const name = 'Learning Service';
+        try {
+            const response =
+                await this.learningServiceHttp.get<string>('/health');
+            return {
+                name,
+                status: 'healthy',
+                message: response.data,
+            };
+        } catch (error) {
+            return {
+                name,
+                status: 'unhealthy',
+                message: `error: ${error}`,
+            };
+        }
+    }
+
     async getHealth(): Promise<ServiceHealth[]> {
         const healthStatuses = await Promise.all([
             this.getAuthServiceHealth(),
             this.getVocabularyServiceHealth(),
+            this.getLearningServiceHealth(),
         ]);
 
         return healthStatuses;

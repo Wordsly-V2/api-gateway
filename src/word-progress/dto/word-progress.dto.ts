@@ -191,6 +191,88 @@ export class DueWordIdsResponseDto {
     wordIds: string[];
 }
 
+export class StatsByWordIdsDto {
+    @ApiProperty({ description: 'Word IDs', type: [String] })
+    @IsArray()
+    @IsUUID(undefined, { each: true })
+    wordIds: string[];
+}
+
+export class ScopeWordIdsDto {
+    @ApiProperty({ description: 'Scope ID (course or lesson)', type: String })
+    @IsUUID()
+    scopeId: string;
+
+    @ApiProperty({ description: 'Word IDs in scope', type: [String] })
+    @IsArray()
+    @IsUUID(undefined, { each: true })
+    wordIds: string[];
+}
+
+export class StatsByScopesDto {
+    @ApiProperty({ description: 'Scopes with word IDs', type: [ScopeWordIdsDto] })
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ScopeWordIdsDto)
+    scopes: ScopeWordIdsDto[];
+}
+
+export class GetDueWordIdsByWordIdsDto {
+    @ApiProperty({ description: 'Word IDs in scope', type: [String] })
+    @IsArray()
+    @IsUUID(undefined, { each: true })
+    wordIds: string[];
+
+    @ApiPropertyOptional({
+        description: 'Maximum number of words to return',
+        example: 20,
+        default: 20,
+        minimum: 1,
+        maximum: 100,
+    })
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @Max(100)
+    limit?: number = 20;
+
+    @ApiPropertyOptional({
+        description: 'Include new words (not yet reviewed)',
+        example: true,
+        default: true,
+    })
+    @IsOptional()
+    @Transform(({ value }) => {
+        if (value === 'true' || value === true) return true;
+        if (value === 'false' || value === false) return false;
+        return true;
+    })
+    @IsBoolean()
+    includeNew?: boolean = true;
+}
+
+export class ByCourseIdsDto {
+    @ApiProperty({ description: 'Course IDs', type: [String] })
+    @IsArray()
+    @IsUUID(undefined, { each: true })
+    courseIds: string[];
+}
+
+export class ByLessonIdsDto {
+    @ApiProperty({ description: 'Lesson IDs', type: [String] })
+    @IsArray()
+    @IsUUID(undefined, { each: true })
+    lessonIds: string[];
+}
+
+export class ByWordIdsDto {
+    @ApiProperty({ description: 'Word IDs', type: [String] })
+    @IsArray()
+    @IsUUID(undefined, { each: true })
+    wordIds: string[];
+}
+
 export class WordProgressStatsDto {
     @ApiProperty({
         description: 'Total words in learning',

@@ -12,6 +12,12 @@ export default () => ({
             process.env.VOCABULARY_SERVICE_INTERNAL_TOKEN ?? '1234567890',
         httpTimeout: process.env.VOCABULARY_SERVICE_HTTP_TIMEOUT,
     },
+    learningService: {
+        host: process.env.LEARNING_SERVICE_HOST ?? 'http://localhost:3003',
+        internalToken:
+            process.env.LEARNING_SERVICE_INTERNAL_TOKEN ?? '1234567890',
+        httpTimeout: process.env.LEARNING_SERVICE_HTTP_TIMEOUT,
+    },
     googleOAuth: {
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,

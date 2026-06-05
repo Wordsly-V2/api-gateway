@@ -39,7 +39,30 @@ import axios from 'axios';
                 });
             },
         },
+        {
+            provide: 'LEARNING_SERVICE_HTTP',
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => {
+                const token = config.get(
+                    'learningService.internalToken',
+                ) as string;
+                const timeout = config.get(
+                    'learningService.httpTimeout',
+                ) as number;
+                const baseURL = config.get('learningService.host') as string;
+
+                return axios.create({
+                    timeout,
+                    baseURL,
+                    headers: { 'x-service-token': token },
+                });
+            },
+        },
     ],
-    exports: ['AUTH_SERVICE_HTTP', 'VOCABULARY_SERVICE_HTTP'],
+    exports: [
+        'AUTH_SERVICE_HTTP',
+        'VOCABULARY_SERVICE_HTTP',
+        'LEARNING_SERVICE_HTTP',
+    ],
 })
 export class HttpClientsModule {}
