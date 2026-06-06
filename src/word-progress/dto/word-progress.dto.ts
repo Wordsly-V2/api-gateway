@@ -10,6 +10,7 @@ import {
     IsUUID,
     Max,
     Min,
+    ArrayMaxSize,
     ValidateNested,
 } from 'class-validator';
 
@@ -53,6 +54,7 @@ export class BulkRecordAnswersDto {
         type: [RecordAnswerDto],
     })
     @IsArray()
+    @ArrayMaxSize(200)
     @ValidateNested({ each: true })
     @Type(() => RecordAnswerDto)
     answers: RecordAnswerDto[];

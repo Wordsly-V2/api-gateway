@@ -69,7 +69,7 @@ export class WordProgressController {
     @ApiOperation({
         summary: 'Record multiple answers (bulk)',
         description:
-            'Records multiple word answers in one request. Each is processed asynchronously.',
+            'Records multiple word answers in one Kafka message for async batch processing.',
     })
     @ApiBody({ type: BulkRecordAnswersDto })
     @ApiResponse({
@@ -82,6 +82,29 @@ export class WordProgressController {
         @Body() body: BulkRecordAnswersDto,
     ): Promise<RecordAnswerAcceptedDto> {
         return this.vocabularyService.recordAnswerBulk(
+            req.user.userLoginId,
+            body,
+        );
+    }
+
+    @Post('record-answer/bulk-sync')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Record multiple answers synchronously (bulk)',
+        description:
+            'Persists all answers in one transaction and returns updated progress. Preferred for session saves.',
+    })
+    @ApiBody({ type: BulkRecordAnswersDto })
+    @ApiResponse({
+        status: 200,
+        description: 'Answers recorded successfully',
+        type: [WordProgressResponseDto],
+    })
+    recordAnswerBulkSync(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() body: BulkRecordAnswersDto,
+    ): Promise<WordProgressResponseDto[]> {
+        return this.vocabularyService.recordAnswerBulkSync(
             req.user.userLoginId,
             body,
         );

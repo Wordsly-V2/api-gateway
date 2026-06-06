@@ -9,3 +9,15 @@ export interface WordProgressRecordAnswerPayload {
     wordId: string;
     quality: AnswerQuality;
 }
+
+/**
+ * Payload for topic: word-progress_record-answers-bulk
+ * One message per practice session batch (async processing).
+ */
+export interface WordProgressRecordAnswersBulkPayload {
+    userLoginId: string;
+    answers: {
+        wordId: string;
+        quality: AnswerQuality;
+    }[];
+}

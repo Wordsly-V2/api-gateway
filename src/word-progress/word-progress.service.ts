@@ -1,6 +1,9 @@
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { KAFKA_TOPICS } from '@/kafka/kafka-topics';
-import type { WordProgressRecordAnswerPayload } from '@/kafka/messages';
+import type {
+    WordProgressRecordAnswerPayload,
+    WordProgressRecordAnswersBulkPayload,
+} from '@/kafka/messages';
 import { KafkaService } from '@/kafka/kafka.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
@@ -49,18 +52,32 @@ export class WordProgressService {
         userLoginId: string,
         body: BulkRecordAnswersDto,
     ): Promise<RecordAnswerAcceptedDto> {
-        for (const answer of body.answers) {
-            const payload: WordProgressRecordAnswerPayload = {
-                userLoginId,
-                wordId: answer.wordId,
-                quality: answer.quality,
-            };
-            await this.kafkaService.sendMessage(
-                KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWER,
-                payload,
-            );
-        }
+        const payload: WordProgressRecordAnswersBulkPayload = {
+            userLoginId,
+            answers: body.answers,
+        };
+        await this.kafkaService.sendMessage(
+            KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWERS_BULK,
+            payload,
+        );
         return { accepted: true };
+    }
+
+    async recordAnswerBulkSync(
+        userLoginId: string,
+        body: BulkRecordAnswersDto,
+    ): Promise<WordProgressResponseDto[]> {
+        try {
+            const response = await this.learningServiceHttp.post<
+                WordProgressResponseDto[]
+            >(
+                `/users/${userLoginId}/word-progress/record-answer/bulk-sync`,
+                body,
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
     }
 
     private async getScopedWordIds(
