@@ -1,18 +1,10 @@
 import { ErrorHandlerService } from '@/error-handler/error-handler.service';
-import { KAFKA_TOPICS } from '@/kafka/kafka-topics';
-import type {
-    WordProgressRecordAnswerPayload,
-    WordProgressRecordAnswersBulkPayload,
-} from '@/kafka/messages';
-import { KafkaService } from '@/kafka/kafka.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
     BulkRecordAnswersDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
-    RecordAnswerAcceptedDto,
-    RecordAnswerDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
 } from './dto/word-progress.dto';
@@ -30,38 +22,7 @@ export class WordProgressService {
         @Inject('VOCABULARY_SERVICE_HTTP')
         private readonly vocabularyServiceHttp: AxiosInstance,
         private readonly errorHandlerService: ErrorHandlerService,
-        private readonly kafkaService: KafkaService,
     ) {}
-
-    async recordAnswer(
-        userLoginId: string,
-        body: RecordAnswerDto,
-    ): Promise<RecordAnswerAcceptedDto> {
-        const payload: WordProgressRecordAnswerPayload = {
-            userLoginId,
-            ...body,
-        };
-        await this.kafkaService.sendMessage(
-            KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWER,
-            payload,
-        );
-        return { accepted: true };
-    }
-
-    async recordAnswerBulk(
-        userLoginId: string,
-        body: BulkRecordAnswersDto,
-    ): Promise<RecordAnswerAcceptedDto> {
-        const payload: WordProgressRecordAnswersBulkPayload = {
-            userLoginId,
-            answers: body.answers,
-        };
-        await this.kafkaService.sendMessage(
-            KAFKA_TOPICS.WORD_PROGRESS_RECORD_ANSWERS_BULK,
-            payload,
-        );
-        return { accepted: true };
-    }
 
     async recordAnswerBulkSync(
         userLoginId: string,

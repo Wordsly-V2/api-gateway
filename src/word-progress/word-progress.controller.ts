@@ -29,8 +29,6 @@ import {
     DueWordIdsResponseDto,
     GetDueWordIdsByWordIdsDto,
     GetDueWordsQueryDto,
-    RecordAnswerAcceptedDto,
-    RecordAnswerDto,
     StatsByScopesDto,
     StatsByWordIdsDto,
     WordProgressResponseDto,
@@ -43,49 +41,6 @@ import { WordProgressService } from './word-progress.service';
 @UseGuards(JwtAuthGuard)
 export class WordProgressController {
     constructor(private readonly vocabularyService: WordProgressService) {}
-
-    @Post('record-answer')
-    @HttpCode(HttpStatus.ACCEPTED)
-    @ApiOperation({
-        summary: 'Record an answer for a word',
-        description:
-            "Records the user's answer quality and updates the spaced repetition schedule",
-    })
-    @ApiBody({ type: RecordAnswerDto })
-    @ApiResponse({
-        status: 202,
-        description: 'Answer accepted for processing',
-        type: RecordAnswerAcceptedDto,
-    })
-    recordAnswer(
-        @Req() req: Request & { user: JwtAuthPayload },
-        @Body() body: RecordAnswerDto,
-    ): Promise<RecordAnswerAcceptedDto> {
-        return this.vocabularyService.recordAnswer(req.user.userLoginId, body);
-    }
-
-    @Post('record-answer/bulk')
-    @HttpCode(HttpStatus.ACCEPTED)
-    @ApiOperation({
-        summary: 'Record multiple answers (bulk)',
-        description:
-            'Records multiple word answers in one Kafka message for async batch processing.',
-    })
-    @ApiBody({ type: BulkRecordAnswersDto })
-    @ApiResponse({
-        status: 202,
-        description: 'Answers accepted for processing',
-        type: RecordAnswerAcceptedDto,
-    })
-    recordAnswerBulk(
-        @Req() req: Request & { user: JwtAuthPayload },
-        @Body() body: BulkRecordAnswersDto,
-    ): Promise<RecordAnswerAcceptedDto> {
-        return this.vocabularyService.recordAnswerBulk(
-            req.user.userLoginId,
-            body,
-        );
-    }
 
     @Post('record-answer/bulk-sync')
     @HttpCode(HttpStatus.OK)

@@ -3,8 +3,6 @@
  * so topic names stay in sync across the codebase.
  */
 export const KAFKA_TOPICS = {
-    WORD_PROGRESS_RECORD_ANSWER: 'word-progress_record-answer',
-    WORD_PROGRESS_RECORD_ANSWERS_BULK: 'word-progress_record-answers-bulk',
     /** One message per word; vocabulary-service consumes and syncs with Langeek. */
     DICTIONARY_SYNC_WORD_LANGEEK: 'dictionary_sync-word-langeek',
 } as const;
