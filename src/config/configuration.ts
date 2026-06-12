@@ -30,8 +30,7 @@ export default () => ({
             process.env.GOOGLE_FRONTEND_REDIRECT_URL ??
             'http://localhost:4000/auth/redirect',
     },
-    corsEnabledOrigins:
-        process.env.CORS_ENABLED_ORIGINS ?? 'http://localhost:4000',
+    corsEnabledOrigins: process.env.CORS_ENABLED_ORIGINS,
     jwt: {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
