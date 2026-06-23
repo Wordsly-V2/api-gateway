@@ -7,7 +7,9 @@ import {
     IsInt,
     IsNumber,
     IsOptional,
+    IsString,
     IsUUID,
+    Matches,
     Max,
     Min,
     ArrayMaxSize,
@@ -50,6 +52,16 @@ export class BulkRecordAnswersDto {
     @ValidateNested({ each: true })
     @Type(() => RecordAnswerDto)
     answers: RecordAnswerDto[];
+
+    @ApiPropertyOptional({
+        description:
+            'Client local calendar date (YYYY-MM-DD) the session happened on. Used for the accuracy trend in the progress report.',
+        example: '2026-06-23',
+    })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/)
+    clientDate?: string;
 }
 
 export class WordProgressResponseDto {

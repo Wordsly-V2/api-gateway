@@ -10,6 +10,7 @@ import { ErrorHandlerModule } from './error-handler/error-handler.module';
 import { HttpClientsModule } from './http-clients/http-clients.module';
 import { DailyHabitModule } from './daily-habit/daily-habit.module';
 import { WordProgressModule } from './word-progress/word-progress.module';
+import { LearningReportModule } from './learning-report/learning-report.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { KafkaModule } from './kafka/kafka.module';
@@ -48,6 +49,7 @@ import { DictionaryModule } from './dictionary/dictionary.module';
         HttpClientsModule,
         WordProgressModule,
         DailyHabitModule,
+        LearningReportModule,
         UsersModule,
         CoursesModule,
         KafkaModule,
