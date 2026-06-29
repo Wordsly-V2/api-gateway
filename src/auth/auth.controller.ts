@@ -44,6 +44,15 @@ export class AuthController {
                     req.user,
                     userIpAddress,
                 );
+
+            if (this.isBodyDelivery()) {
+                return res.redirect(
+                    `${frontendRedirectUrl}?access_token=${accessToken}&refresh_token=${encodeURIComponent(
+                        refreshToken,
+                    )}`,
+                );
+            }
+
             this.setRefreshTokenCookie(res, refreshToken);
 
             return res.redirect(
@@ -58,12 +67,21 @@ export class AuthController {
 
     @Get('refresh-token')
     async refresh(
-        @Req() req: Request & { cookies: { refresh_token: string } },
+        @Req()
+        req: Request & {
+            cookies: { refresh_token: string };
+            headers: { 'x-refresh-token'?: string };
+        },
         @Res() res: Response,
     ) {
         const userIpAddress = req.ip;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const refreshToken = req.cookies['refresh_token'] as string;
+        const isBodyDelivery = this.isBodyDelivery();
+        // In 'body' mode the frontend sends the refresh token via header (it lives in
+        // localStorage); in 'cookie' mode it comes from the http cookie.
+        const refreshToken = isBodyDelivery
+            ? (req.headers['x-refresh-token'] as string)
+            : // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              (req.cookies['refresh_token'] as string);
         if (!refreshToken) {
             return res.status(401).json({ message: 'Refresh token not found' });
         }
@@ -79,6 +97,13 @@ export class AuthController {
                 jwtPayload,
                 userIpAddress,
             });
+
+            if (isBodyDelivery) {
+                return res.status(200).json({
+                    accessToken: newAccessToken,
+                    refreshToken: newRefreshToken,
+                });
+            }
 
             this.setRefreshTokenCookie(res, newRefreshToken);
 
@@ -108,6 +133,12 @@ export class AuthController {
         );
         res.clearCookie('refresh_token');
         return res.status(200).json({ message: 'Logged out successfully' });
+    }
+
+    private isBodyDelivery(): boolean {
+        return (
+            this.configService.get<string>('refreshTokenDelivery') === 'body'
+        );
     }
 
     private setRefreshTokenCookie(res: Response, refreshToken: string) {

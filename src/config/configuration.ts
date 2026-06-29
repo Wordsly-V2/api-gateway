@@ -41,6 +41,14 @@ export default () => ({
         cert: process.env.KAFKA_CERT ?? '',
         key: process.env.KAFKA_KEY ?? '',
     },
+    // How the refresh token is delivered to / read from the client:
+    // - 'cookie' (default): stored in an http cookie (requires a correct domain/subdomain
+    //   setup, otherwise the browser may block it cross-site).
+    // - 'body': returned in the response body / redirect URL so the frontend can keep it in
+    //   localStorage and send it back via the `x-refresh-token` header when refreshing.
+    refreshTokenDelivery: (process.env.REFRESH_TOKEN_DELIVERY as
+        | 'cookie'
+        | 'body') ?? 'cookie',
     // For Render (API and frontend on different origins): set REFRESH_TOKEN_COOKIE_SAME_SITE=none
     // (secure is forced to true when sameSite is 'none').
     refreshTokenCookieOptions: {
