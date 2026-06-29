@@ -113,6 +113,29 @@ export class ReportStreaksDto {
     longestGoalStreak: number;
 }
 
+export class ReportLevelDto {
+    @ApiProperty({ example: 7 })
+    level: number;
+
+    @ApiProperty({ example: 'Apprentice' })
+    rank: string;
+
+    @ApiProperty({ example: 430 })
+    totalXp: number;
+
+    @ApiProperty({ example: 130 })
+    currentLevelXp: number;
+
+    @ApiProperty({ example: 200 })
+    xpForThisLevel: number;
+
+    @ApiProperty({ example: 70 })
+    xpToNextLevel: number;
+
+    @ApiProperty({ example: 65 })
+    progress: number;
+}
+
 export class ReportAchievementDto {
     @ApiProperty({ example: 'streak-7' })
     key: string;
@@ -154,6 +177,9 @@ export class LearningReportResponseDto {
 
     @ApiProperty({ type: ReportStreaksDto })
     streaks: ReportStreaksDto;
+
+    @ApiProperty({ type: ReportLevelDto })
+    level: ReportLevelDto;
 
     @ApiProperty({ type: [ReportAchievementDto] })
     achievements: ReportAchievementDto[];

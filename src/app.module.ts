@@ -11,6 +11,7 @@ import { HttpClientsModule } from './http-clients/http-clients.module';
 import { DailyHabitModule } from './daily-habit/daily-habit.module';
 import { WordProgressModule } from './word-progress/word-progress.module';
 import { LearningReportModule } from './learning-report/learning-report.module';
+import { UserLevelModule } from './user-level/user-level.module';
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { KafkaModule } from './kafka/kafka.module';
@@ -50,6 +51,7 @@ import { DictionaryModule } from './dictionary/dictionary.module';
         WordProgressModule,
         DailyHabitModule,
         LearningReportModule,
+        UserLevelModule,
         UsersModule,
         CoursesModule,
         KafkaModule,
