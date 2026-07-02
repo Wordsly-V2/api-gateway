@@ -378,6 +378,23 @@ export class CoursesService {
         }
     }
 
+    /** Hydrate words by ID across all of the user's courses (ownership-scoped). */
+    async getWordsByIdsAllCourses(
+        userLoginId: string,
+        ids: string,
+    ): Promise<Word[]> {
+        try {
+            const wordIds = ids ? ids.split(',').filter(Boolean) : [];
+            const response = await this.vocabularyServiceHttp.post<Word[]>(
+                `/users/${userLoginId}/words/hydrate-by-ids`,
+                { wordIds },
+            );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
     async reorderLessons(
         userLoginId: string,
         courseId: string,

@@ -24,7 +24,13 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+    ApiBody,
+    ApiOperation,
+    ApiParam,
+    ApiQuery,
+    ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('courses')
 @UseGuards(JwtAuthGuard)
@@ -340,6 +346,26 @@ export class CoursesController {
         return this.coursesService.getWordsByIds(
             req.user.userLoginId,
             courseId,
+            ids,
+        );
+    }
+
+    @Get('/me/my-words')
+    @ApiOperation({
+        summary: "Get words by ID across all of the current user's courses",
+    })
+    @ApiQuery({
+        name: 'ids',
+        required: true,
+        type: String,
+        description: 'Comma-separated word IDs',
+    })
+    getWordsByIdsAllCourses(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Query('ids') ids: string,
+    ): Promise<Word[]> {
+        return this.coursesService.getWordsByIdsAllCourses(
+            req.user.userLoginId,
             ids,
         );
     }
