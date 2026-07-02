@@ -216,7 +216,10 @@ export class ScopeWordIdsDto {
 }
 
 export class StatsByScopesDto {
-    @ApiProperty({ description: 'Scopes with word IDs', type: [ScopeWordIdsDto] })
+    @ApiProperty({
+        description: 'Scopes with word IDs',
+        type: [ScopeWordIdsDto],
+    })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ScopeWordIdsDto)

@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@/app.module';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
-import { AuthService } from './auth/auth.service';
 import { buildCorsOptions, parseCorsOrigins } from '@/config/cors';
 
 async function bootstrap() {
@@ -19,6 +19,8 @@ async function bootstrap() {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     app.use(cookieParser());
+
+    app.use(compression());
     app.useGlobalPipes(
         new ValidationPipe({
             transform: true,
@@ -31,11 +33,6 @@ async function bootstrap() {
     console.log(`API Gateway is running on port ${appPort}`);
     console.log(
         `CORS enabled origins: ${parseCorsOrigins(corsEnabledOrigins).join(', ') || 'none'}`,
-    );
-
-    console.log(
-        'refresh token options',
-        app.get(AuthService).getRefreshTokenCookieOptions(),
     );
 }
 void bootstrap();

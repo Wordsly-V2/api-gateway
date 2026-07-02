@@ -1,20 +1,28 @@
+// Without a timeout a hung downstream service blocks gateway handlers forever.
+const parseHttpTimeout = (value: string | undefined): number =>
+    parseInt(value ?? '', 10) || 15000;
+
 export default () => ({
     nodeEnv: process.env.NODE_ENV ?? 'development',
     port: parseInt(process.env.PORT ?? '3000', 10) ?? 3000,
     authService: {
         host: process.env.AUTH_SERVICE_HOST ?? 'http://localhost:3001',
         internalToken: process.env.AUTH_SERVICE_INTERNAL_TOKEN,
-        httpTimeout: process.env.AUTH_SERVICE_HTTP_TIMEOUT,
+        httpTimeout: parseHttpTimeout(process.env.AUTH_SERVICE_HTTP_TIMEOUT),
     },
     vocabularyService: {
         host: process.env.VOCABULARY_SERVICE_HOST ?? 'http://localhost:3002',
         internalToken: process.env.VOCABULARY_SERVICE_INTERNAL_TOKEN,
-        httpTimeout: process.env.VOCABULARY_SERVICE_HTTP_TIMEOUT,
+        httpTimeout: parseHttpTimeout(
+            process.env.VOCABULARY_SERVICE_HTTP_TIMEOUT,
+        ),
     },
     learningService: {
         host: process.env.LEARNING_SERVICE_HOST ?? 'http://localhost:3003',
         internalToken: process.env.LEARNING_SERVICE_INTERNAL_TOKEN,
-        httpTimeout: process.env.LEARNING_SERVICE_HTTP_TIMEOUT,
+        httpTimeout: parseHttpTimeout(
+            process.env.LEARNING_SERVICE_HTTP_TIMEOUT,
+        ),
     },
     googleOAuth: {
         clientId: process.env.GOOGLE_CLIENT_ID,
@@ -44,9 +52,8 @@ export default () => ({
     //   setup, otherwise the browser may block it cross-site).
     // - 'body': returned in the response body / redirect URL so the frontend can keep it in
     //   localStorage and send it back via the `x-refresh-token` header when refreshing.
-    refreshTokenDelivery: (process.env.REFRESH_TOKEN_DELIVERY as
-        | 'cookie'
-        | 'body') ?? 'cookie',
+    refreshTokenDelivery:
+        (process.env.REFRESH_TOKEN_DELIVERY as 'cookie' | 'body') ?? 'cookie',
     // For Render (API and frontend on different origins): set REFRESH_TOKEN_COOKIE_SAME_SITE=none
     // (secure is forced to true when sameSite is 'none').
     refreshTokenCookieOptions: {

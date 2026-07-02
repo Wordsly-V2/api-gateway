@@ -34,9 +34,7 @@ import { DictionaryModule } from './dictionary/dictionary.module';
             inject: [ConfigService],
             useFactory: (config: ConfigService) => {
                 const secret = config.get('jwt.secret') as string;
-                const expiresIn = config.get(
-                    'jwt.expiresIn',
-                ) as JwtSignOptions['expiresIn'];
+                const expiresIn = config.get('jwt.expiresIn');
 
                 return {
                     secret,

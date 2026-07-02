@@ -279,13 +279,18 @@ export class WordProgressController {
     @ApiOperation({
         summary: 'Reset progress for multiple words (bulk)',
         description:
-            'Deletes learning progress for the given word IDs. Only words in the user\'s courses are reset.',
+            "Deletes learning progress for the given word IDs. Only words in the user's courses are reset.",
     })
     @ApiBody({
         schema: {
             type: 'object',
             required: ['wordIds'],
-            properties: { wordIds: { type: 'array', items: { type: 'string', format: 'uuid' } } },
+            properties: {
+                wordIds: {
+                    type: 'array',
+                    items: { type: 'string', format: 'uuid' },
+                },
+            },
         },
     })
     @ApiResponse({

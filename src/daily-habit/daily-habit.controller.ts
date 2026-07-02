@@ -10,12 +10,7 @@ import {
     Req,
     UseGuards,
 } from '@nestjs/common';
-import {
-    ApiBody,
-    ApiOperation,
-    ApiResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
     DailyHabitQueryDto,
     DailyHabitResponseDto,

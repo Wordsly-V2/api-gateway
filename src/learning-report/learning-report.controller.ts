@@ -12,7 +12,9 @@ import { LearningReportService } from './learning-report.service';
 @Controller('learning-report')
 @UseGuards(JwtAuthGuard)
 export class LearningReportController {
-    constructor(private readonly learningReportService: LearningReportService) {}
+    constructor(
+        private readonly learningReportService: LearningReportService,
+    ) {}
 
     @Get()
     @ApiOperation({
