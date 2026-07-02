@@ -3,6 +3,7 @@ import { AppService } from '@/app.service';
 import { AuthModule } from '@/auth/auth.module';
 import { JwtAuthStrategy } from '@/common/guard/jwt-auth/jwt-auth.strategy';
 import configuration from '@/config/configuration';
+import { validateEnv } from '@/config/validate-env';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
@@ -25,6 +26,7 @@ import { DictionaryModule } from './dictionary/dictionary.module';
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configuration],
+            validate: validateEnv,
         }),
         JwtModule.registerAsync({
             global: true,

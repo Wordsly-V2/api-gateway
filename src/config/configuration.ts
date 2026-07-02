@@ -3,19 +3,17 @@ export default () => ({
     port: parseInt(process.env.PORT ?? '3000', 10) ?? 3000,
     authService: {
         host: process.env.AUTH_SERVICE_HOST ?? 'http://localhost:3001',
-        internalToken: process.env.AUTH_SERVICE_INTERNAL_TOKEN ?? '1234567890',
+        internalToken: process.env.AUTH_SERVICE_INTERNAL_TOKEN,
         httpTimeout: process.env.AUTH_SERVICE_HTTP_TIMEOUT,
     },
     vocabularyService: {
         host: process.env.VOCABULARY_SERVICE_HOST ?? 'http://localhost:3002',
-        internalToken:
-            process.env.VOCABULARY_SERVICE_INTERNAL_TOKEN ?? '1234567890',
+        internalToken: process.env.VOCABULARY_SERVICE_INTERNAL_TOKEN,
         httpTimeout: process.env.VOCABULARY_SERVICE_HTTP_TIMEOUT,
     },
     learningService: {
         host: process.env.LEARNING_SERVICE_HOST ?? 'http://localhost:3003',
-        internalToken:
-            process.env.LEARNING_SERVICE_INTERNAL_TOKEN ?? '1234567890',
+        internalToken: process.env.LEARNING_SERVICE_INTERNAL_TOKEN,
         httpTimeout: process.env.LEARNING_SERVICE_HTTP_TIMEOUT,
     },
     googleOAuth: {
