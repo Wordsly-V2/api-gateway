@@ -23,12 +23,15 @@ import {
 } from '@nestjs/swagger';
 import {
     BulkRecordAnswersDto,
+    BulkRecordAnswersResponseDto,
     ByCourseIdsDto,
     ByLessonIdsDto,
     ByWordIdsDto,
     DueWordIdsResponseDto,
     GetDueWordIdsByWordIdsDto,
     GetDueWordsQueryDto,
+    LeechesQueryDto,
+    LeechesResponseDto,
     StatsByScopesDto,
     StatsByWordIdsDto,
     WordProgressResponseDto,
@@ -53,12 +56,12 @@ export class WordProgressController {
     @ApiResponse({
         status: 200,
         description: 'Answers recorded successfully',
-        type: [WordProgressResponseDto],
+        type: BulkRecordAnswersResponseDto,
     })
     recordAnswerBulkSync(
         @Req() req: Request & { user: JwtAuthPayload },
         @Body() body: BulkRecordAnswersDto,
-    ): Promise<WordProgressResponseDto[]> {
+    ): Promise<BulkRecordAnswersResponseDto> {
         return this.vocabularyService.recordAnswerBulkSync(
             req.user.userLoginId,
             body,
@@ -162,6 +165,65 @@ export class WordProgressController {
             body.wordIds,
             body.limit,
             body.includeNew,
+            body.clientDate,
+        );
+    }
+
+    @Get('leeches')
+    @ApiOperation({
+        summary: 'Get leech cards in scope',
+        description:
+            'Resolves the word IDs in scope, then returns cards flagged as leeches (lapsed past the threshold), most-lapsed first.',
+    })
+    @ApiQuery({
+        name: 'courseId',
+        required: false,
+        type: String,
+        description: 'Filter by specific course',
+    })
+    @ApiQuery({
+        name: 'lessonId',
+        required: false,
+        type: String,
+        description: 'Filter by specific lesson',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Leeches retrieved successfully',
+        type: LeechesResponseDto,
+    })
+    getLeeches(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Query() query: LeechesQueryDto,
+    ): Promise<LeechesResponseDto> {
+        return this.vocabularyService.getLeeches(
+            req.user.userLoginId,
+            query.courseId,
+            query.lessonId,
+        );
+    }
+
+    @Post('words/:wordId/unsuspend')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Unsuspend a card so it re-enters review selection',
+    })
+    @ApiParam({
+        name: 'wordId',
+        description: 'Word ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Word unsuspended successfully',
+    })
+    unsuspendWord(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('wordId') wordId: string,
+    ): Promise<{ success: boolean }> {
+        return this.vocabularyService.unsuspendWord(
+            req.user.userLoginId,
+            wordId,
         );
     }
 

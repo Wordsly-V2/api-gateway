@@ -3,8 +3,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
     BulkRecordAnswersDto,
+    BulkRecordAnswersResponseDto,
     DueWordIdsResponseDto,
     GetDueWordsQueryDto,
+    LeechesResponseDto,
     WordProgressResponseDto,
     WordProgressStatsDto,
 } from './dto/word-progress.dto';
@@ -27,15 +29,19 @@ export class WordProgressService {
     async recordAnswerBulkSync(
         userLoginId: string,
         body: BulkRecordAnswersDto,
-    ): Promise<WordProgressResponseDto[]> {
+    ): Promise<BulkRecordAnswersResponseDto> {
         try {
             const response = await this.learningServiceHttp.post<
-                WordProgressResponseDto[]
+                BulkRecordAnswersResponseDto | WordProgressResponseDto[]
             >(
                 `/users/${userLoginId}/word-progress/record-answer/bulk-sync`,
                 body,
             );
-            return response.data;
+            const data = response.data;
+            // Tolerate the legacy array shape from older learning-service builds.
+            return Array.isArray(data)
+                ? { results: data, xpMultiplier: 1 }
+                : data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
         }
@@ -103,6 +109,7 @@ export class WordProgressService {
                         wordIds,
                         limit: query.limit,
                         includeNew: query.includeNew,
+                        clientDate: query.clientDate,
                     },
                 );
             return response.data;
@@ -116,13 +123,50 @@ export class WordProgressService {
         wordIds: string[],
         limit?: number,
         includeNew?: boolean,
+        clientDate?: string,
     ): Promise<DueWordIdsResponseDto> {
         try {
             const response =
                 await this.learningServiceHttp.post<DueWordIdsResponseDto>(
                     `/users/${userLoginId}/word-progress/due-word-ids`,
-                    { wordIds, limit, includeNew },
+                    { wordIds, limit, includeNew, clientDate },
                 );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async getLeeches(
+        userLoginId: string,
+        courseId?: string,
+        lessonId?: string,
+    ): Promise<LeechesResponseDto> {
+        try {
+            const wordIds = await this.getScopedWordIds(
+                userLoginId,
+                courseId,
+                lessonId,
+            );
+            const response =
+                await this.learningServiceHttp.post<LeechesResponseDto>(
+                    `/users/${userLoginId}/word-progress/leeches`,
+                    { wordIds },
+                );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async unsuspendWord(
+        userLoginId: string,
+        wordId: string,
+    ): Promise<{ success: boolean }> {
+        try {
+            const response = await this.learningServiceHttp.post<{
+                success: boolean;
+            }>(`/users/${userLoginId}/word-progress/words/${wordId}/unsuspend`);
             return response.data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);

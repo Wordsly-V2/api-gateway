@@ -57,6 +57,33 @@ export class UpdateDailyGoalDto {
     dailyGoal: number;
 }
 
+export class UnlockedAchievementDto {
+    @ApiProperty({ description: 'Achievement key', example: 'streak-7' })
+    key: string;
+
+    @ApiProperty({ description: 'Human label', example: '7-day streak' })
+    label: string;
+
+    @ApiProperty({
+        description: 'Category',
+        example: 'streak',
+        enum: ['streak', 'words', 'days'],
+    })
+    category: 'streak' | 'words' | 'days';
+
+    @ApiProperty({ description: 'XP awarded for the unlock', example: 57 })
+    xpAwarded: number;
+
+    @ApiProperty({
+        description: 'Whether a streak freeze was granted',
+        example: true,
+    })
+    streakFreezeAwarded: boolean;
+
+    @ApiProperty({ description: 'When it was unlocked' })
+    unlockedAt: Date;
+}
+
 export class DailyHabitDayDto {
     @ApiProperty({ example: '2026-06-05' })
     date: string;
@@ -113,4 +140,10 @@ export class DailyHabitResponseDto {
 
     @ApiProperty({ example: 'Almost there — 2 more words to hit your goal.' })
     message: string;
+
+    @ApiPropertyOptional({
+        description: 'Achievements unlocked by this practice, if any',
+        type: [UnlockedAchievementDto],
+    })
+    unlockedAchievements?: UnlockedAchievementDto[];
 }

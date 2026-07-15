@@ -64,6 +64,56 @@ export class BulkRecordAnswersDto {
     clientDate?: string;
 }
 
+export class LevelEventDto {
+    @ApiProperty({ description: 'Current numeric level', example: 7 })
+    level: number;
+
+    @ApiProperty({
+        description: 'Named rank tier for the level',
+        example: 'Apprentice',
+    })
+    rank: string;
+
+    @ApiProperty({ description: 'Cumulative XP earned all-time', example: 430 })
+    totalXp: number;
+
+    @ApiProperty({
+        description: 'XP earned within the current level',
+        example: 130,
+    })
+    currentLevelXp: number;
+
+    @ApiProperty({
+        description: 'Total XP span of the current level',
+        example: 200,
+    })
+    xpForThisLevel: number;
+
+    @ApiProperty({
+        description: 'XP still needed to reach the next level',
+        example: 70,
+    })
+    xpToNextLevel: number;
+
+    @ApiProperty({
+        description: 'Progress through the current level, 0..100',
+        example: 65,
+    })
+    progress: number;
+
+    @ApiProperty({ description: 'XP earned by this action', example: 28 })
+    xpEarned: number;
+
+    @ApiProperty({
+        description: 'Whether this action raised the level',
+        example: true,
+    })
+    leveledUp: boolean;
+
+    @ApiProperty({ description: 'Level before this action', example: 6 })
+    previousLevel: number;
+}
+
 export class WordProgressResponseDto {
     @ApiProperty({
         description: 'Word progress ID',
@@ -136,6 +186,53 @@ export class WordProgressResponseDto {
     })
     @IsNumber()
     successRate: number;
+
+    @ApiPropertyOptional({
+        description: 'FSRS state: 0=New 1=Learning 2=Review 3=Relearning',
+        example: 2,
+    })
+    state?: number;
+
+    @ApiPropertyOptional({
+        description: 'Times the card has lapsed (Again on a Review card)',
+        example: 1,
+    })
+    lapses?: number;
+
+    @ApiPropertyOptional({
+        description: 'Whether this card has lapsed past the leech threshold',
+        example: false,
+    })
+    isLeech?: boolean;
+
+    @ApiPropertyOptional({
+        description:
+            'When the card was suspended (withheld from reviews), if any',
+        example: '2026-02-06T09:15:44.000Z',
+        nullable: true,
+    })
+    suspendedAt?: Date | null;
+}
+
+export class BulkRecordAnswersResponseDto {
+    @ApiProperty({
+        description: 'Per-word progress after recording the session',
+        type: [WordProgressResponseDto],
+    })
+    results: WordProgressResponseDto[];
+
+    @ApiPropertyOptional({
+        description:
+            'XP/level result for the whole session so the client can celebrate a level-up.',
+        type: LevelEventDto,
+    })
+    levelEvent?: LevelEventDto;
+
+    @ApiProperty({
+        description: 'Streak XP multiplier applied to this session (1 = none)',
+        example: 1.25,
+    })
+    xpMultiplier: number;
 }
 
 export class GetDueWordsQueryDto {
@@ -182,6 +279,33 @@ export class GetDueWordsQueryDto {
     })
     @IsBoolean()
     includeNew?: boolean = true;
+
+    @ApiPropertyOptional({
+        description:
+            'Client local calendar date (YYYY-MM-DD) used to count today’s new words/reviews against the daily pacing limits.',
+        example: '2026-06-05',
+    })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/)
+    clientDate?: string;
+}
+
+export class PacingInfoDto {
+    @ApiProperty({ description: 'New words still allowed today', example: 5 })
+    newWordsRemainingToday: number;
+
+    @ApiProperty({ description: 'Reviews still allowed today', example: 80 })
+    reviewsRemainingToday: number;
+
+    @ApiProperty({
+        description: 'Configured daily new-word limit',
+        example: 10,
+    })
+    dailyNewWordLimit: number;
+
+    @ApiProperty({ description: 'Configured daily review limit', example: 100 })
+    dailyReviewLimit: number;
 }
 
 export class DueWordIdsResponseDto {
@@ -195,6 +319,12 @@ export class DueWordIdsResponseDto {
         ],
     })
     wordIds: string[];
+
+    @ApiPropertyOptional({
+        description: 'Remaining daily pacing budget after this request',
+        type: PacingInfoDto,
+    })
+    pacing?: PacingInfoDto;
 }
 
 export class StatsByWordIdsDto {
@@ -259,6 +389,16 @@ export class GetDueWordIdsByWordIdsDto {
     })
     @IsBoolean()
     includeNew?: boolean = true;
+
+    @ApiPropertyOptional({
+        description:
+            'Client local calendar date (YYYY-MM-DD) used to count today’s new words/reviews against the daily pacing limits.',
+        example: '2026-06-05',
+    })
+    @IsOptional()
+    @IsString()
+    @Matches(/^\d{4}-\d{2}-\d{2}$/)
+    clientDate?: string;
 }
 
 export class ByCourseIdsDto {
@@ -318,4 +458,62 @@ export class WordProgressStatsDto {
         example: 85.5,
     })
     overallSuccessRate: number;
+}
+
+export class LeechesQueryDto {
+    @ApiPropertyOptional({
+        description: 'Filter by specific course ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @IsOptional()
+    @IsUUID()
+    courseId?: string;
+
+    @ApiPropertyOptional({
+        description: 'Filter by specific lesson ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @IsOptional()
+    @IsUUID()
+    lessonId?: string;
+}
+
+export class LeechItemDto {
+    @ApiProperty({
+        description: 'Word ID',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    wordId: string;
+
+    @ApiProperty({ description: 'Times the card has lapsed', example: 9 })
+    lapses: number;
+
+    @ApiProperty({ description: 'FSRS state', example: 3 })
+    state: number;
+
+    @ApiProperty({ description: 'Total reviews', example: 20 })
+    totalReviews: number;
+
+    @ApiProperty({ description: 'Correct reviews', example: 8 })
+    correctReviews: number;
+
+    @ApiProperty({ description: 'Success rate percentage', example: 40 })
+    successRate: number;
+
+    @ApiPropertyOptional({
+        description: 'When suspended, if suspended',
+        nullable: true,
+    })
+    suspendedAt?: Date | null;
+
+    @ApiProperty({ description: 'Next review date' })
+    nextReviewAt: Date;
+}
+
+export class LeechesResponseDto {
+    @ApiProperty({
+        description: 'Leech cards, most-lapsed first',
+        type: [LeechItemDto],
+    })
+    leeches: LeechItemDto[];
 }
