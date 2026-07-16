@@ -4,14 +4,6 @@ import { IsOptional, IsUUID } from 'class-validator';
 /** Optional filters for syncing words with Langeek. All omitted = sync all words. */
 export class SyncWordsLangeekDto {
     @ApiPropertyOptional({
-        description: 'Filter by user (course owner)',
-        example: '01936c1e-1234-7890-abcd-ef1234567890',
-    })
-    @IsOptional()
-    @IsUUID()
-    userId?: string;
-
-    @ApiPropertyOptional({
         description: 'Filter by course',
         example: '01936c1e-5678-7890-abcd-ef1234567890',
     })

@@ -142,16 +142,15 @@ export class DictionaryController {
         status: 200,
         description: 'Number of words enqueued (total, enqueued)',
     })
-    async syncWordsWithLangeek(@Body() dto: SyncWordsLangeekDto) {
-        const filters =
-            dto.userId || dto.courseId || dto.lessonId || dto.wordId
-                ? {
-                      userId: dto.userId,
-                      courseId: dto.courseId,
-                      lessonId: dto.lessonId,
-                      wordId: dto.wordId,
-                  }
-                : undefined;
-        return this.dictionaryService.syncWordsWithLangeek(filters);
+    async syncWordsWithLangeek(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Body() dto: SyncWordsLangeekDto,
+    ) {
+        return this.dictionaryService.syncWordsWithLangeek({
+            userId: req.user.userLoginId,
+            courseId: dto.courseId,
+            lessonId: dto.lessonId,
+            wordId: dto.wordId,
+        });
     }
 }
