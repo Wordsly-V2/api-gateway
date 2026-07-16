@@ -28,6 +28,51 @@ export class SyncWordsLangeekDto {
     wordId?: string;
 }
 
+/** Result of enqueueing a Langeek sync (returns a jobId to poll progress). */
+export class SyncWordsLangeekResponseDto {
+    @ApiProperty({ description: 'Sync job identifier used to poll progress' })
+    jobId: string;
+
+    @ApiProperty({ description: 'Total words that will be processed' })
+    total: number;
+
+    @ApiProperty({ description: 'Words enqueued to Kafka' })
+    enqueued: number;
+}
+
+/** Progress snapshot for a sync job. */
+export class SyncJobStatusDto {
+    @ApiProperty()
+    jobId: string;
+
+    @ApiProperty({ enum: ['in_progress', 'completed'] })
+    status: 'in_progress' | 'completed';
+
+    @ApiProperty()
+    total: number;
+
+    @ApiProperty({ description: 'Words processed so far' })
+    done: number;
+
+    @ApiProperty({ description: 'Words still to process' })
+    remaining: number;
+
+    @ApiProperty()
+    updated: number;
+
+    @ApiProperty()
+    skipped: number;
+
+    @ApiProperty()
+    errored: number;
+
+    @ApiProperty()
+    createdAt: string;
+
+    @ApiProperty()
+    updatedAt: string;
+}
+
 /** A single example sentence with optional per-example audio/translation. */
 export class LangeekExampleDto {
     @ApiProperty({ example: 'She waved hello to her neighbour.' })

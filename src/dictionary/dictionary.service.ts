@@ -6,6 +6,7 @@ import type { AxiosInstance } from 'axios';
 import {
     DictionarySearchResultDto,
     LangeekWordDetailsDto,
+    SyncJobStatusDto,
 } from './dto/dctionary.dto';
 
 @Injectable()
@@ -92,8 +93,16 @@ export class DictionaryService {
         courseId?: string;
         lessonId?: string;
         wordId?: string;
-    }): Promise<{ total: number; enqueued: number }> {
+    }): Promise<{ jobId: string; total: number; enqueued: number }> {
         try {
+            // Create the progress record first so its total is authoritative and
+            // the job exists before any consumer starts reporting progress.
+            const { data: job } = await this.vocabularyServiceHttp.post<{
+                jobId: string;
+                total: number;
+                status: string;
+            }>('/dictionary/sync-words-langeek/jobs', filters ?? {});
+
             let totalEnqueued = 0;
             let cursor: string | undefined;
 
@@ -120,6 +129,7 @@ export class DictionaryService {
                             wordId: w.wordId,
                             word: w.word,
                             partOfSpeech: w.partOfSpeech,
+                            jobId: job.jobId,
                         })),
                     );
                     totalEnqueued += words.length;
@@ -127,7 +137,31 @@ export class DictionaryService {
                 cursor = nextCursor ?? undefined;
             } while (cursor);
 
-            return { total: totalEnqueued, enqueued: totalEnqueued };
+            return {
+                jobId: job.jobId,
+                total: job.total,
+                enqueued: totalEnqueued,
+            };
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    /**
+     * Fetches the progress of a sync job, scoped to the requesting user (a user
+     * can only read their own jobs).
+     */
+    async getSyncJobStatus(
+        jobId: string,
+        userLoginId: string,
+    ): Promise<SyncJobStatusDto> {
+        try {
+            const { data } =
+                await this.vocabularyServiceHttp.get<SyncJobStatusDto>(
+                    `/dictionary/sync-words-langeek/jobs/${jobId}`,
+                    { params: { userLoginId } },
+                );
+            return data;
         } catch (error) {
             throw this.errorHandlerService.translateAxiosError(error);
         }

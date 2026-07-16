@@ -14,7 +14,9 @@ import { DictionaryService } from './dictionary.service';
 import {
     DictionarySearchResultDto,
     LangeekWordDetailsDto,
+    SyncJobStatusDto,
     SyncWordsLangeekDto,
+    SyncWordsLangeekResponseDto,
 } from './dto/dctionary.dto';
 
 @Controller('dictionary')
@@ -140,17 +142,42 @@ export class DictionaryController {
     })
     @ApiResponse({
         status: 200,
-        description: 'Number of words enqueued (total, enqueued)',
+        description:
+            'Sync job created (jobId to poll progress, total, enqueued)',
+        type: SyncWordsLangeekResponseDto,
     })
     async syncWordsWithLangeek(
         @Req() req: Request & { user: JwtAuthPayload },
         @Body() dto: SyncWordsLangeekDto,
-    ) {
+    ): Promise<SyncWordsLangeekResponseDto> {
         return this.dictionaryService.syncWordsWithLangeek({
             userId: req.user.userLoginId,
             courseId: dto.courseId,
             lessonId: dto.lessonId,
             wordId: dto.wordId,
         });
+    }
+
+    @Get('sync-words-langeek/status/:jobId')
+    @ApiOperation({
+        summary: 'Get sync job progress',
+        description:
+            'Returns progress for a sync job started via POST sync-words-langeek: total, done, remaining, and whether it is still in progress or completed. Only the job owner can read it.',
+    })
+    @ApiParam({ name: 'jobId', description: 'Sync job identifier' })
+    @ApiResponse({
+        status: 200,
+        description: 'Sync job progress',
+        type: SyncJobStatusDto,
+    })
+    @ApiResponse({ status: 404, description: 'Job not found' })
+    async getSyncStatus(
+        @Req() req: Request & { user: JwtAuthPayload },
+        @Param('jobId') jobId: string,
+    ): Promise<SyncJobStatusDto> {
+        return this.dictionaryService.getSyncJobStatus(
+            jobId,
+            req.user.userLoginId,
+        );
     }
 }
