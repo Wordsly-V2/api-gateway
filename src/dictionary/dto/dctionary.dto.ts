@@ -36,6 +36,21 @@ export class SyncWordsLangeekDto {
     wordId?: string;
 }
 
+/** A single example sentence with optional per-example audio/translation. */
+export class LangeekExampleDto {
+    @ApiProperty({ example: 'She waved hello to her neighbour.' })
+    text: string;
+
+    @ApiPropertyOptional({
+        description: 'Audio (TTS) URL for the example sentence',
+        example: 'https://example.com/audio/example.mp3',
+    })
+    audioUrl?: string;
+
+    @ApiPropertyOptional({ description: 'Translation of the example sentence' })
+    translation?: string;
+}
+
 /** Structured word details from vocabulary-service GET word-details. */
 export class LangeekWordDetailsDto {
     @ApiProperty()
@@ -53,8 +68,8 @@ export class LangeekWordDetailsDto {
     @ApiProperty()
     audioUrl: string;
 
-    @ApiProperty({ type: [String] })
-    examples: string[];
+    @ApiProperty({ type: [LangeekExampleDto] })
+    examples: LangeekExampleDto[];
 
     @ApiProperty({
         description: 'URL to word image, or empty if none',
