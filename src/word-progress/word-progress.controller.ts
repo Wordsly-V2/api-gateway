@@ -166,6 +166,7 @@ export class WordProgressController {
             body.limit,
             body.includeNew,
             body.clientDate,
+            body.newLimit,
         );
     }
 

@@ -108,6 +108,7 @@ export class WordProgressService {
                     {
                         wordIds,
                         limit: query.limit,
+                        newLimit: query.newLimit,
                         includeNew: query.includeNew,
                         clientDate: query.clientDate,
                     },
@@ -124,12 +125,13 @@ export class WordProgressService {
         limit?: number,
         includeNew?: boolean,
         clientDate?: string,
+        newLimit?: number,
     ): Promise<DueWordIdsResponseDto> {
         try {
             const response =
                 await this.learningServiceHttp.post<DueWordIdsResponseDto>(
                     `/users/${userLoginId}/word-progress/due-word-ids`,
-                    { wordIds, limit, includeNew, clientDate },
+                    { wordIds, limit, newLimit, includeNew, clientDate },
                 );
             return response.data;
         } catch (error) {
