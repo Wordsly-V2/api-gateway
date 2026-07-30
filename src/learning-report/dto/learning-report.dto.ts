@@ -47,6 +47,9 @@ export class ReportBucketDto {
     @ApiProperty({ example: 12 })
     wordsPracticed: number;
 
+    @ApiProperty({ example: 7 })
+    reviewedWords: number;
+
     @ApiProperty({ example: 18 })
     reviews: number;
 
@@ -69,6 +72,9 @@ export class ReportBucketDto {
 export class ReportSummaryDto {
     @ApiProperty({ example: 84 })
     wordsLearned: number;
+
+    @ApiProperty({ example: 64 })
+    reviewedWords: number;
 
     @ApiProperty({ example: 120 })
     totalReviews: number;
