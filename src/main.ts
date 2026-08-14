@@ -4,11 +4,19 @@ import { AppModule } from '@/app.module';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { buildCorsOptions, parseCorsOrigins } from '@/config/cors';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     const configService = app.get(ConfigService);
+
+    // Behind a proxy, req.ip is the proxy unless X-Forwarded-For is trusted;
+    // auth-service logs that IP when a refresh token rotates from a new network.
+    const trustProxyHops = configService.get<number>('trustProxyHops');
+    if (trustProxyHops) {
+        app.set('trust proxy', trustProxyHops);
+    }
 
     const corsEnabledOrigins = configService.get<string>('corsEnabledOrigins');
 

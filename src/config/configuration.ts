@@ -37,6 +37,11 @@ export default () => ({
             'http://localhost:4000/auth/redirect',
     },
     corsEnabledOrigins: process.env.CORS_ENABLED_ORIGINS,
+    // Number of reverse-proxy hops in front of the gateway. Behind a load
+    // balancer `req.ip` is the proxy's address unless Express is told to trust
+    // X-Forwarded-For, which makes the client IP that auth-service logs on
+    // refresh useless. 0 disables trust (direct connections).
+    trustProxyHops: parseInt(process.env.TRUST_PROXY_HOPS ?? '0', 10) || 0,
     jwt: {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES_IN ?? '15m',

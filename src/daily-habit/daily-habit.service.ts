@@ -2,6 +2,7 @@ import { ErrorHandlerService } from '@/error-handler/error-handler.service';
 import { Inject, Injectable } from '@nestjs/common';
 import type { AxiosInstance } from 'axios';
 import {
+    BatchRecordDailyPracticeDto,
     DailyHabitResponseDto,
     RecordDailyPracticeDto,
     UpdateDailyGoalDto,
@@ -39,6 +40,22 @@ export class DailyHabitService {
             const response =
                 await this.learningServiceHttp.post<DailyHabitResponseDto>(
                     `/users/${userLoginId}/daily-habit/record-practice`,
+                    body,
+                );
+            return response.data;
+        } catch (error) {
+            throw this.errorHandlerService.translateAxiosError(error);
+        }
+    }
+
+    async recordPracticeBatch(
+        userLoginId: string,
+        body: BatchRecordDailyPracticeDto,
+    ): Promise<DailyHabitResponseDto> {
+        try {
+            const response =
+                await this.learningServiceHttp.post<DailyHabitResponseDto>(
+                    `/users/${userLoginId}/daily-habit/record-practice/batch`,
                     body,
                 );
             return response.data;

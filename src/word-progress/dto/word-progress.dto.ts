@@ -5,6 +5,7 @@ import {
     IsBoolean,
     IsEnum,
     IsInt,
+    IsISO8601,
     IsNumber,
     IsOptional,
     IsString,
@@ -40,7 +41,19 @@ export class RecordAnswerDto {
     })
     @IsEnum(AnswerQuality)
     quality: AnswerQuality;
+
+    @ApiPropertyOptional({
+        description:
+            'ISO-8601 instant the user actually answered. Offline clients send the real answer time so scheduling happens from when the review occurred rather than from sync time. Clamped by learning-service.',
+        example: '2026-08-11T14:03:22.117Z',
+    })
+    @IsOptional()
+    @IsISO8601({ strict: true })
+    reviewedAt?: string;
 }
+
+/** Max answers per bulk save; mirrors MAX_BULK_ANSWERS in learning-service. */
+export const MAX_BULK_ANSWERS = 500;
 
 export class BulkRecordAnswersDto {
     @ApiProperty({
@@ -48,20 +61,42 @@ export class BulkRecordAnswersDto {
         type: [RecordAnswerDto],
     })
     @IsArray()
-    @ArrayMaxSize(200)
+    @ArrayMaxSize(MAX_BULK_ANSWERS)
     @ValidateNested({ each: true })
     @Type(() => RecordAnswerDto)
     answers: RecordAnswerDto[];
 
     @ApiPropertyOptional({
         description:
-            'Client local calendar date (YYYY-MM-DD) the session happened on. Used for the accuracy trend in the progress report.',
+            "Client local calendar date (YYYY-MM-DD) for the client's today. Used for the accuracy trend in the progress report.",
         example: '2026-06-23',
     })
     @IsOptional()
     @IsString()
     @Matches(/^\d{4}-\d{2}-\d{2}$/)
     clientDate?: string;
+
+    @ApiPropertyOptional({
+        description:
+            "Minutes to ADD to a UTC instant to get the user's local wall-clock time (i.e. -getTimezoneOffset()). Lets learning-service derive each answer's calendar date from its reviewedAt.",
+        example: 420,
+        minimum: -840,
+        maximum: 840,
+    })
+    @IsOptional()
+    @IsInt()
+    @Min(-840)
+    @Max(840)
+    tzOffsetMinutes?: number;
+
+    @ApiPropertyOptional({
+        description:
+            'Client-generated UUID identifying this flush. Replaying the same id returns the original response without re-applying XP or scheduling.',
+        example: '01936b3e-7c8f-7890-abcd-ef1234567890',
+    })
+    @IsOptional()
+    @IsUUID()
+    clientRequestId?: string;
 }
 
 export class LevelEventDto {
@@ -233,6 +268,13 @@ export class BulkRecordAnswersResponseDto {
         example: 1.25,
     })
     xpMultiplier: number;
+
+    @ApiPropertyOptional({
+        description:
+            'True when this response was replayed from the idempotency ledger — nothing was applied, so the client must not re-animate XP.',
+        example: false,
+    })
+    replayed?: boolean;
 }
 
 export class GetDueWordsQueryDto {
