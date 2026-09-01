@@ -1,11 +1,22 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Matches } from 'class-validator';
+import {
+    IsIn,
+    IsInt,
+    IsOptional,
+    IsString,
+    Matches,
+    Max,
+    Min,
+} from 'class-validator';
 
 export type ReportPeriod = 'week' | 'month' | 'year';
 export type ReportGranularity = 'day' | 'month';
 
 export const REPORT_PERIODS: ReportPeriod[] = ['week', 'month', 'year'];
+
+/** Furthest window the report can be paged back to (~10 years of weeks). */
+export const MAX_REPORT_OFFSET = 520;
 
 const CLIENT_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -18,6 +29,21 @@ export class LearningReportQueryDto {
     @IsOptional()
     @IsIn(REPORT_PERIODS)
     period?: ReportPeriod;
+
+    @ApiPropertyOptional({
+        description:
+            'Whole periods back from today: 0 is the current window, 1 the previous one, and so on.',
+        example: 0,
+        default: 0,
+        minimum: 0,
+        maximum: MAX_REPORT_OFFSET,
+    })
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(0)
+    @Max(MAX_REPORT_OFFSET)
+    offset?: number;
 
     @ApiPropertyOptional({
         description: 'Client local calendar date (YYYY-MM-DD)',
@@ -179,6 +205,12 @@ export class ReportAchievementDto {
 export class LearningReportResponseDto {
     @ApiProperty({ enum: REPORT_PERIODS, example: 'week' })
     period: ReportPeriod;
+
+    @ApiProperty({
+        description: 'Whole periods back from today (0 = current window)',
+        example: 0,
+    })
+    offset: number;
 
     @ApiProperty({ enum: ['day', 'month'], example: 'day' })
     granularity: ReportGranularity;

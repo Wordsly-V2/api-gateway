@@ -20,12 +20,13 @@ export class LearningReportService {
         userLoginId: string,
         period?: ReportPeriod,
         clientDate?: string,
+        offset?: number,
     ): Promise<LearningReportResponseDto> {
         try {
             const response =
                 await this.learningServiceHttp.get<LearningReportResponseDto>(
                     `/users/${userLoginId}/learning-report`,
-                    { params: { period, clientDate } },
+                    { params: { period, clientDate, offset } },
                 );
             return response.data;
         } catch (error) {
