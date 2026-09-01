@@ -1,69 +1,32 @@
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
-import { AuthModule } from '@/auth/auth.module';
-import { JwtAuthStrategy } from '@/common/guard/jwt-auth/jwt-auth.strategy';
 import configuration from '@/config/configuration';
 import { validateEnv } from '@/config/validate-env';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule, JwtSignOptions } from '@nestjs/jwt';
-import { ErrorHandlerModule } from './error-handler/error-handler.module';
-import { HttpClientsModule } from './http-clients/http-clients.module';
-import { DailyHabitModule } from './daily-habit/daily-habit.module';
-import { WordProgressModule } from './word-progress/word-progress.module';
-import { LearningReportModule } from './learning-report/learning-report.module';
-import { LearningSettingsModule } from './learning-settings/learning-settings.module';
-import { PreferencesModule } from './preferences/preferences.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { UserLevelModule } from './user-level/user-level.module';
-import { UsersModule } from './users/users.module';
-import { CoursesModule } from './courses/courses.module';
-import { KafkaModule } from './kafka/kafka.module';
-import { DictionaryController } from './dictionary/dictionary.controller';
-import { DictionaryService } from './dictionary/dictionary.service';
-import { DictionaryModule } from './dictionary/dictionary.module';
+import { ConfigModule } from '@nestjs/config';
 
+/**
+ * The gateway is a reverse proxy, not an API.
+ *
+ * It used to be a hand-wired facade: every downstream endpoint had a matching
+ * controller, service and typed axios call here, so adding a service endpoint
+ * meant adding a gateway endpoint too. Routing now lives in one declarative
+ * table (`src/proxy/routes.ts`) and is applied as Express middleware in
+ * `main.ts`, before Nest sees the request.
+ *
+ * The only route this process still answers itself is the health check, which
+ * is operational rather than business logic and is what the frontend's
+ * bootstrap depends on.
+ */
 @Module({
     imports: [
-        AuthModule,
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configuration],
             validate: validateEnv,
         }),
-        JwtModule.registerAsync({
-            global: true,
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (config: ConfigService) => {
-                const secret = config.get('jwt.secret') as string;
-                const expiresIn = config.get('jwt.expiresIn');
-
-                return {
-                    secret,
-                    signOptions: {
-                        expiresIn: expiresIn,
-                        algorithm: 'RS256',
-                        issuer: 'api-gateway',
-                    },
-                };
-            },
-        }),
-        ErrorHandlerModule,
-        HttpClientsModule,
-        WordProgressModule,
-        DailyHabitModule,
-        LearningReportModule,
-        LearningSettingsModule,
-        PreferencesModule,
-        NotificationsModule,
-        UserLevelModule,
-        UsersModule,
-        CoursesModule,
-        KafkaModule,
-        DictionaryModule,
     ],
-    controllers: [AppController, DictionaryController],
-    providers: [AppService, JwtAuthStrategy, DictionaryService],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}
