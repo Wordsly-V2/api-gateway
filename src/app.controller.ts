@@ -12,6 +12,6 @@ export class AppController {
 
     @Get('health')
     getHealth() {
-        return this.appService.getHealth();
+        return 'Api Gateway - Healthy';
     }
 }
