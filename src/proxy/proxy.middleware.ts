@@ -41,9 +41,14 @@ export function registerProxyRoutes(
                 target,
                 pathFilter: route.paths,
                 // Paths are identical on both sides, so there is nothing to
-                // rewrite. Keeping the Host header means downstream services see
-                // the address the browser actually used.
-                changeOrigin: false,
+                // rewrite. The Host header IS rewritten to the target's host:
+                // platforms that route by Host (Render, and any other
+                // reverse-proxied host) send a forwarded request carrying the
+                // gateway's own hostname straight back to the gateway, which
+                // their edge rejects as a routing loop (508, `x-render-routing:
+                // loop`). Nothing downstream reads Host, and `xfwd` below still
+                // passes the browser's address as X-Forwarded-Host.
+                changeOrigin: true,
                 // Adds X-Forwarded-For, which is how auth-service recovers the
                 // real client IP for its refresh-token network-change logging.
                 xfwd: true,
