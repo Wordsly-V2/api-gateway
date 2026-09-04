@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Wordsly public API gateway (NestJS, port 3000). It is **not** a transparent reverse proxy — it is a hand-wired REST facade: every downstream endpoint has an explicit controller → service → typed axios call. Adding a service endpoint means adding a gateway route that forwards to it.
+Wordsly public API gateway (NestJS, port 3000). It is a **pure reverse proxy** — nine source files, no controllers, no credentials, no business logic. `src/proxy/routes.ts` is its entire routing table; adding a service endpoint means adding nothing here unless it introduces a new top-level path segment.
+
+It used to be a hand-wired REST facade (a controller → service → axios call per downstream endpoint) that also ran the Google OAuth handshake, held a copy of the JWT verification key, and decoded refresh tokens on auth-service's behalf. All of that moved into auth-service. Docs or code elsewhere describing `src/http-clients/`, `JwtAuthGuard`, or a messaging module here are stale — none of it exists.
 
 ## Commands
 
@@ -13,29 +15,31 @@ npm run start:dev    # watch mode on PORT (default 3000)
 npm run build        # nest build
 npm run lint         # eslint --fix
 npm run test         # jest (rootDir=src, *.spec.ts)
-npx jest path/to/file.spec.ts   # single test file
 ```
 
-Config: all env access goes through `src/config/configuration.ts` (never `process.env` in features); required vars validated at boot by `src/config/validate-env.ts`. Swagger at `/api`.
+Config: all env access goes through `src/config/configuration.ts` (never `process.env` in features); required vars validated at boot by `src/config/validate-env.ts` — the three service hosts plus `CORS_ENABLED_ORIGINS`, which is required rather than optional because an empty value used to silently disable CORS instead of failing.
 
 ## Architecture
 
-### Downstream HTTP clients
+### The routing table is the whole thing
 
-`src/http-clients/http-clients.module.ts` (global) provides three injectable axios instances — `AUTH_SERVICE_HTTP`, `VOCABULARY_SERVICE_HTTP`, `LEARNING_SERVICE_HTTP` — each pre-configured with the service base URL, a default 15s timeout, keep-alive agents, and the `x-service-token` internal auth header. Always inject these; never create ad-hoc axios instances.
+`src/proxy/routes.ts` maps a first path segment to a service. Public paths are identical to the paths the services expose, so there is no rewriting: what a browser asks for is what the service receives. Matching used to have to look at the *third* segment, because every user-scoped route began `users/:userLoginId/` and all three services shared that prefix — routes no longer name a user at all, so the first segment is unambiguous again.
 
-### Auth (this gateway owns the browser-facing flow)
+Collection roots are listed alongside the `/**` form (`'/courses'` *and* `'/courses/**'`): a glob ending in `/**` does not match the bare collection path.
 
-- Google OAuth handshake lives here (`src/auth/strategy/google.strategy.ts`, `GET /auth/google` → `/auth/google/redirect`); on callback the gateway calls auth-service `POST /auth/login-oauth` to upsert the user and mint tokens.
-- Access tokens are RS256 JWTs verified at the gateway by `JwtAuthGuard` (`src/common/guard/jwt-auth/`) — apply it per controller. The JWT key pair must match auth-service's.
-- Refresh tokens arrive via httpOnly cookie (default) or `x-refresh-token` header depending on `REFRESH_TOKEN_DELIVERY` (`cookie` | `body`; body mode exists for cross-origin deployments like Render). `GET /auth/refresh-token` verifies locally then delegates rotation to auth-service.
-- Route handlers read the caller's identity from the JWT payload (`userLoginId`) and pass it in the downstream user-scoped path — never trust a client-supplied user id.
+### What it deliberately does not do
 
-### Bootstrap middleware
+- **No token verification.** Each service verifies the caller's access token itself against auth-service's published key set. The gateway forwards `Authorization` untouched and holds no key material.
+- **No credentials of its own.** No JWT key, no Google client secret, no internal service token. It cannot authenticate to its peers because it never needs to — it forwards the caller's own.
+- **No body parsing** (`bodyParser: false` in `main.ts`, and the proxy is registered before any parser). The request body streams straight through; parsing it here would consume the stream, break uploads, and hang a POST waiting for a body already read.
 
-`src/main.ts` applies CORS (origins from `CORS_ENABLED_ORIGINS`), `cookie-parser`, `compression`, and a global `ValidationPipe` (`transform` + `whitelist`). DTOs with class-validator on every route.
+### Header hygiene
+
+`STRIPPED_REQUEST_HEADERS` (`routes.ts`) removes `x-service-token`, `x-internal-call`, `x-user-id` and `x-user-login-id` from every inbound request. None of these mean anything downstream any more — identity comes from the token's signature and the user id from its subject — but they are stripped rather than merely ignored so a client cannot revive a retired trust header by sending one.
+
+CORS is answered once at the edge (`main.ts`), which is why the proxy also strips any `Access-Control-*` a service sends back. The `Host` header **is** rewritten to the target's host: platforms that route by Host reject a forwarded request carrying the gateway's own hostname as a routing loop. `xfwd` still passes the browser's address as `X-Forwarded-Host`.
 
 ## Conventions
 
-- Path alias `@/*` → `src/*`; feature-based modules; kebab-case folders; controllers thin, logic in services; 4-space indent, single quotes.
-- Kafka producing (login events etc.) goes through the messaging module; topic names in `src/messaging/constants.ts`; producer no-ops when `KAFKA_BROKERS` is empty.
+- Path alias `@/*` → `src/*`; kebab-case folders; 4-space indent, single quotes.
+- Changes here should be rare. If a task seems to need a controller in this repo, it almost certainly belongs in the service that owns the data.

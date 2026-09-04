@@ -6,9 +6,19 @@
  * is the point of the table — it is a map, not a translation layer, and adding a
  * service endpoint no longer means writing a matching gateway endpoint.
  *
- * `/users/**` is shared by all three services, so matching is on the *third*
- * segment rather than the first. Order matters only in that the first match
- * wins; the patterns are disjoint.
+ * Matching is on the first path segment. It used to have to look at the *third*,
+ * because every user-scoped route began `users/:userLoginId/` and so all three
+ * services shared the `/users/**` prefix. Routes no longer name a user at all —
+ * each service reads the id from the caller's token — which leaves the first
+ * segment unambiguous again. Order matters only in that the first match wins;
+ * the patterns are disjoint.
+ *
+ * These are plain prefix paths, not globs, and http-proxy-middleware will not
+ * let the two be mixed in one list — `['/courses', '/courses/**']` throws
+ * ERR_CONTEXT_MATCHER_INVALID_ARRAY at request time, not at boot. A plain path
+ * already matches its whole subtree (it is an `indexOf(path) === 0` test), so
+ * `'/courses'` covers `/courses` and `/courses/:id/lessons` alike and the `/**`
+ * form is not just unnecessary but harmful. The route-table spec pins this.
  */
 
 export type ServiceKey = 'auth' | 'vocabulary' | 'learning';
@@ -25,41 +35,28 @@ export const PROXY_ROUTES: ProxyRoute[] = [
         paths: [
             // Discovery and the published key set: how every other service
             // learns which keys to trust.
-            '/.well-known/**',
+            '/.well-known',
             // The whole browser-facing auth flow, forwarded untouched. The
             // Google callback URL points here, so the handshake keeps working
             // with no change in the Google console.
-            '/auth/**',
-            '/users/*/profile',
+            '/auth',
+            '/profile',
         ],
     },
     {
         service: 'vocabulary',
-        paths: [
-            // Collection roots are listed alongside the `/**` form: a glob
-            // ending in `/**` does not match the bare collection path, and
-            // `GET /users/:id/courses` is exactly that.
-            '/users/*/courses',
-            '/users/*/courses/**',
-            '/users/*/words',
-            '/users/*/words/**',
-            '/dictionary/**',
-        ],
+        paths: ['/courses', '/words', '/dictionary'],
     },
     {
         service: 'learning',
         paths: [
-            '/users/*/word-progress',
-            '/users/*/word-progress/**',
-            '/users/*/daily-habit',
-            '/users/*/daily-habit/**',
-            '/users/*/learning-report',
-            '/users/*/learning-report/**',
-            '/users/*/learning-settings',
-            '/users/*/preferences',
-            '/users/*/notifications',
-            '/users/*/notifications/**',
-            '/users/*/level',
+            '/word-progress',
+            '/daily-habit',
+            '/learning-report',
+            '/learning-settings',
+            '/preferences',
+            '/notifications',
+            '/level',
         ],
     },
 ];
@@ -67,12 +64,13 @@ export const PROXY_ROUTES: ProxyRoute[] = [
 /**
  * Headers stripped from every inbound request.
  *
- * This is the single most important line in the gateway. Downstream services
- * treat a valid `x-service-token` as proof that the caller is a peer service and
- * skip every per-user ownership check. A proxy that forwarded a client-supplied
- * one — or attached its own, as the old hand-wired clients did — would turn that
- * into a bypass of every guard in the system for anyone who could guess or leak
- * the value. The gateway holds no such token any more, and refuses to relay one.
+ * Each of these once told a service who the caller was without any signature to
+ * back it up: `x-service-token` marked a request as coming from a peer and
+ * skipped every per-user check, and the `x-user-*` pair named the user outright.
+ * None of them mean anything downstream any more — identity comes from the
+ * access token's signature, and the user id from its subject. They are still
+ * stripped rather than merely ignored, so that a retired trust header cannot be
+ * revived by a client that simply sends one.
  */
 export const STRIPPED_REQUEST_HEADERS = [
     'x-service-token',
