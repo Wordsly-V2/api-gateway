@@ -4,6 +4,7 @@ import configuration from '@/config/configuration';
 import { validateEnv } from '@/config/validate-env';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { RequestContextLogger } from './common/request-context-logger';
 
 /**
  * The gateway is a reverse proxy, not an API.
@@ -27,6 +28,6 @@ import { ConfigModule } from '@nestjs/config';
         }),
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [RequestContextLogger, AppService],
 })
 export class AppModule {}

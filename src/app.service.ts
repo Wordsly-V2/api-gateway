@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 type ServiceHealth = {
@@ -26,6 +26,8 @@ const SERVICES: { name: string; configKey: string }[] = [
  */
 @Injectable()
 export class AppService {
+    private readonly logger = new Logger(AppService.name);
+
     constructor(private readonly configService: ConfigService) {}
 
     async getHealth(): Promise<ServiceHealth[]> {
@@ -45,11 +47,19 @@ export class AppService {
         }
 
         try {
-            const response = await fetch(`${host}/health`, {
+            // `/ready`, not `/health`: the latter is a liveness endpoint that
+            // answers without touching a dependency, so aggregating it reported
+            // every service healthy with their databases down.
+            const response = await fetch(`${host}/ready`, {
                 // A health check must never be the thing that hangs.
                 signal: AbortSignal.timeout(5_000),
             });
 
+            // Deliberately does not forward the downstream body. `/ready`
+            // answers with the reason it is not ready — which names hosts,
+            // ports and driver errors — and this endpoint is reachable from a
+            // browser. The status is what a caller needs; the detail belongs in
+            // the service's own logs.
             if (!response.ok) {
                 return {
                     name,
@@ -58,12 +68,15 @@ export class AppService {
                 };
             }
 
-            return { name, status: 'healthy', message: await response.text() };
-        } catch (error) {
+            return { name, status: 'healthy', message: 'ready' };
+        } catch {
+            // Same reasoning: the error names the internal host it failed to
+            // reach, so it is logged rather than returned.
+            this.logger.warn(`${name} readiness probe failed`);
             return {
                 name,
                 status: 'unhealthy',
-                message: `error: ${String(error)}`,
+                message: 'unreachable',
             };
         }
     }
