@@ -59,6 +59,18 @@ const sharedOptions: Partial<Options> = {
  *
  * Checks the declared length first, then counts actual bytes: Content-Length is
  * absent on a chunked request and is in any case only a claim.
+ *
+ * The `req.pause()` below is load-bearing. Attaching a 'data' listener puts the
+ * request in flowing mode, and http-proxy-middleware's handler is async — it
+ * awaits its per-request options before http-proxy reaches `req.pipe(proxyReq)`
+ * — so the resume scheduled by that listener runs first and the body is emitted
+ * to the byte counter, which discards it, before the pipe exists. The proxied
+ * request then carries the original Content-Length with no body: upstream waits
+ * for bytes that never arrive until `proxyTimeout` aborts the socket, and the
+ * caller gets a 502 (ECONNRESET). Every request with a body 502s; GETs and
+ * /health are unaffected, which is what made it look like a network fault.
+ * Pausing hands the proxy a stream that has not started flowing; `pipe()`
+ * resumes it, and the chunks then reach the counter and the socket alike.
  */
 function bodySizeLimit(req: Request, res: Response, next: NextFunction): void {
     const declared = Number(req.headers['content-length']);
@@ -79,6 +91,7 @@ function bodySizeLimit(req: Request, res: Response, next: NextFunction): void {
             req.destroy();
         }
     });
+    req.pause();
 
     next();
 }
