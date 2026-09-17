@@ -51,6 +51,7 @@ export const PROXY_ROUTES: ProxyRoute[] = [
         service: 'learning',
         paths: [
             '/word-progress',
+            '/saved-words',
             '/daily-habit',
             '/learning-report',
             '/learning-settings',
