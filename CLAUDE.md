@@ -27,6 +27,22 @@ Config: all env access goes through `src/config/configuration.ts` (never `proces
 
 Collection roots are listed alongside the `/**` form (`'/courses'` *and* `'/courses/**'`): a glob ending in `/**` does not match the bare collection path.
 
+### Cold starts
+
+`src/app.service.ts` is the other documented exception to "pure reverse proxy".
+`GET /wake` boots all three services — retrying `/health` (liveness, so a service
+still connecting to Postgres counts as awake) until they answer or a 45s budget
+runs out, single-flighted so concurrent tabs share one fan-out. `/ping` is the
+cheap readiness aggregate and cannot do this job: its five-second abort expires
+long before a suspended instance has started, so it reported "unreachable" for a
+service it had just woken. The gateway also wakes the services on boot, and again
+from the proxy's error handler when a request fails with a cold-shaped code
+(which also sets `Retry-After`).
+
+This is why the per-service `httpTimeout` defaults to **60s**, not 15s: the
+platform holds a request while the container boots, and the old default cut every
+such request off as a 504.
+
 ### What it deliberately does not do
 
 - **No token verification.** Each service verifies the caller's access token itself against auth-service's published key set. The gateway forwards `Authorization` untouched and holds no key material.

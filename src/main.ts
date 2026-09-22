@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@/app.module';
+import { AppService } from '@/app.service';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { buildCorsOptions, parseCorsOrigins } from '@/config/cors';
 import { requestIdMiddleware } from '@/common/request-id.middleware';
@@ -50,10 +51,16 @@ async function bootstrap() {
     // traffic has to be mounted ahead of it.
     registerEdgeProtection(expressApp);
 
-    registerProxyRoutes(expressApp, configService);
+    registerProxyRoutes(expressApp, configService, app.get(AppService));
 
     const appPort = configService.get<number>('port');
     await app.listen(appPort as number);
+
+    // The request that woke this gateway is usually a learner opening the app,
+    // and the three services behind it are asleep too. Start booting them now
+    // rather than waiting for that learner's first proxied call to discover it
+    // — the two cold starts overlap instead of stacking.
+    app.get(AppService).wakeInBackground();
     bootLogger.log(`API Gateway is running on port ${appPort}`);
     bootLogger.log(
         `CORS enabled origins: ${parseCorsOrigins(corsEnabledOrigins).join(', ')}`,

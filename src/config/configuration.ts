@@ -1,6 +1,13 @@
 // Without a timeout a hung downstream service blocks a request forever.
+//
+// The default has to clear a cold start, not just a healthy round trip. On a
+// suspended free-tier instance the platform holds the connection while the
+// container boots, which routinely takes 30-60s; at the old 15s default every
+// request during that window was cut off as a 504, so the first page load after
+// an idle period reliably came up empty. A hung service is still bounded, just
+// generously enough that booting is not mistaken for hanging.
 const parseHttpTimeout = (value: string | undefined): number =>
-    parseInt(value ?? '', 10) || 15000;
+    parseInt(value ?? '', 10) || 60000;
 
 /**
  * The gateway needs to know only where to send traffic.

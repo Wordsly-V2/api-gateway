@@ -9,6 +9,7 @@ import {
     STRIPPED_REQUEST_HEADERS,
     type ServiceKey,
 } from '@/proxy/routes';
+import type { AppService } from '@/app.service';
 
 const logger = new Logger('Proxy');
 
@@ -45,6 +46,23 @@ function statusForError(code: string | undefined): number {
     }
 }
 
+/**
+ * Connection-level failures that, on a platform that suspends idle instances,
+ * usually mean "still booting" rather than "broken". Worth telling the client
+ * to come back, and worth nudging the service awake for the retry.
+ */
+const COLD_START_ERROR_CODES = new Set([
+    'ECONNREFUSED',
+    'ECONNRESET',
+    'ETIMEDOUT',
+    'ESOCKETTIMEDOUT',
+    'ECONNABORTED',
+    'EHOSTUNREACH',
+]);
+
+/** Seconds. Matches the gateway's own wake retry cadence. */
+const RETRY_AFTER_SECONDS = 5;
+
 /** A ServerResponse, as opposed to the raw Socket an upgrade error carries. */
 function isResponse(value: unknown): value is ServerResponse {
     return (
@@ -65,6 +83,7 @@ function isResponse(value: unknown): value is ServerResponse {
 export function registerProxyRoutes(
     app: Application,
     configService: ConfigService,
+    appService: AppService,
 ): void {
     for (const route of PROXY_ROUTES) {
         const target = configService.get<string>(
@@ -164,9 +183,26 @@ export function registerProxyRoutes(
                         }
 
                         const statusCode = statusForError(code);
+                        const isColdStart = COLD_START_ERROR_CODES.has(
+                            code ?? '',
+                        );
+
+                        if (isColdStart) {
+                            // This request is already lost, but the learner's
+                            // retry does not have to be: start the service
+                            // booting now so the next attempt lands on
+                            // something that is at least on its way up.
+                            appService.wakeInBackground();
+                        }
 
                         res.writeHead(statusCode, {
                             'Content-Type': 'application/json',
+                            // Says "transient, come back" in a way a client can
+                            // act on without pattern-matching status codes. The
+                            // frontend's retry policy reads it.
+                            ...(isColdStart
+                                ? { 'Retry-After': String(RETRY_AFTER_SECONDS) }
+                                : {}),
                         });
                         res.end(
                             JSON.stringify({
