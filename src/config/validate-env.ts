@@ -26,5 +26,15 @@ export function validateEnv(
         );
     }
 
+    // A typo here fell back to 0 silently, and behind a load balancer that makes
+    // the rate limiter treat every learner as one caller. On Render it is 1.
+    const rawHops = config.TRUST_PROXY_HOPS;
+    const trustProxyHops = typeof rawHops === 'string' ? rawHops.trim() : '';
+    if (trustProxyHops !== '' && !/^\d+$/.test(trustProxyHops)) {
+        throw new Error(
+            `TRUST_PROXY_HOPS must be a non-negative integer, got "${trustProxyHops}"`,
+        );
+    }
+
     return config;
 }

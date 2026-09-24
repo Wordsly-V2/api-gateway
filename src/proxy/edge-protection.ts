@@ -32,7 +32,7 @@ const AUTH_MAX = 20;
  * Cap on a proxied request body.
  *
  * The gateway streams bodies through without parsing, so nothing else bounds
- * them. `POST /word-progress/record-answers/bulk` is the largest legitimate
+ * them. `POST /word-progress/record-answer/bulk-sync` is the largest legitimate
  * payload and is itself capped at 500 answers server-side, which is far below
  * this.
  */

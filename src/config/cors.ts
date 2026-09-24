@@ -33,7 +33,11 @@ export function buildCorsOptions(
                 return;
             }
 
-            callback(new Error('Not allowed by CORS'));
+            // Answer without CORS headers rather than with an error: an Error
+            // here went to Express's default handler as a 500 (with a stack
+            // trace outside production). The browser blocks the response either
+            // way; this just stops a foreign origin looking like our outage.
+            callback(null, false);
         },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -43,5 +47,18 @@ export function buildCorsOptions(
             'Cookie',
             'x-refresh-token',
         ],
+        // Headers the frontend must be able to read: Retry-After and the
+        // RateLimit pair drive its backoff, x-request-id ties a failure report
+        // to server logs.
+        exposedHeaders: [
+            'Retry-After',
+            'RateLimit',
+            'RateLimit-Policy',
+            'x-request-id',
+        ],
+        // Cache preflights for 10 minutes. Every request carries Authorization,
+        // so without this each one costs an extra round trip — painful on slow
+        // mobile links and doubled during a cold start.
+        maxAge: 600,
     };
 }

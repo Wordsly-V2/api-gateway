@@ -23,7 +23,8 @@ export default () => ({
     // every request otherwise carries the balancer's IP, which would make the
     // edge rate limiter throttle the entire user base as a single caller.
     trustProxyHops: parseInt(process.env.TRUST_PROXY_HOPS ?? '0', 10) || 0,
-    port: parseInt(process.env.PORT ?? '3000', 10) ?? 3000,
+    // `||`, not `??`: parseInt yields NaN (never null) for a bad value.
+    port: parseInt(process.env.PORT ?? '3000', 10) || 3000,
     authService: {
         host: process.env.AUTH_SERVICE_HOST ?? 'http://localhost:3001',
         httpTimeout: parseHttpTimeout(process.env.AUTH_SERVICE_HTTP_TIMEOUT),
