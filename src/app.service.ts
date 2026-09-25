@@ -136,11 +136,11 @@ export class AppService {
 
         if (!host) return { name, state: 'down', ms: 0 };
 
-        // `/health` rather than `/ready`: liveness answers without touching
-        // Postgres, so a service whose pool is still connecting still counts as
-        // awake — and waking the container is the whole point here. Readiness is
-        // `/ping`'s question.
-        const url = `${host}/health`;
+        // `/ping` rather than `/ready`: it answers without touching Postgres,
+        // so a service whose pool is still connecting still counts as awake —
+        // and waking the container is the whole point here. Readiness is the
+        // gateway `/ping`'s question. Not `/health`, which Render blocks.
+        const url = `${host}/ping`;
 
         for (let attempt = 1; ; attempt++) {
             try {
