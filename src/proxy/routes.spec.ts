@@ -77,6 +77,14 @@ describe('PROXY_ROUTES', () => {
             ['/notifications/subscriptions', 'learning'],
             ['/notifications/preferences', 'learning'],
             ['/notifications/vapid-public-key', 'learning'],
+
+            ['/path', 'curriculum'],
+            ['/path/ping', 'curriculum'],
+            ['/path/me', 'curriculum'],
+            ['/path/lessons/lesson-1/complete', 'curriculum'],
+            ['/path/items/filter-published', 'curriculum'],
+            ['/admin/path/units', 'curriculum'],
+            ['/admin/path/releases/release-1/activate', 'curriculum'],
         ])('%s → %s', (path, service) => {
             expect(serviceFor(path)).toBe(service);
         });

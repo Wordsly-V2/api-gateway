@@ -17,12 +17,14 @@ const HOST_CONFIG_KEY: Record<ServiceKey, string> = {
     auth: 'authService.host',
     vocabulary: 'vocabularyService.host',
     learning: 'learningService.host',
+    curriculum: 'curriculumService.host',
 };
 
 const TIMEOUT_CONFIG_KEY: Record<ServiceKey, string> = {
     auth: 'authService.httpTimeout',
     vocabulary: 'vocabularyService.httpTimeout',
     learning: 'learningService.httpTimeout',
+    curriculum: 'curriculumService.httpTimeout',
 };
 
 /**
