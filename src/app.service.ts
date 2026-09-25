@@ -36,7 +36,11 @@ const SERVICES: { name: string; configKey: string }[] = [
  * caller gets a real answer and can call again, rather than having its socket
  * time out mid-fan-out with nothing to show.
  */
-const WAKE_BUDGET_MS = 45_000;
+/**
+ * Measured cold boots on the free tier run 33-54s per service, so the old 45s
+ * budget reported services "down" that were seconds from answering.
+ */
+const WAKE_BUDGET_MS = 65_000;
 /** One attempt. Long enough for a cold boot, short enough to leave retries. */
 const WAKE_ATTEMPT_TIMEOUT_MS = 20_000;
 const WAKE_RETRY_DELAY_MS = 2_000;
