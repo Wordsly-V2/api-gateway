@@ -24,6 +24,7 @@ const SERVICES: { name: string; configKey: string }[] = [
     { name: 'Auth Service', configKey: 'authService.host' },
     { name: 'Vocabulary Service', configKey: 'vocabularyService.host' },
     { name: 'Learning Service', configKey: 'learningService.host' },
+    { name: 'Curriculum Service', configKey: 'curriculumService.host' },
 ];
 
 /**

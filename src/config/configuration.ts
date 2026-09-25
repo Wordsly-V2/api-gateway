@@ -41,5 +41,11 @@ export default () => ({
             process.env.LEARNING_SERVICE_HTTP_TIMEOUT,
         ),
     },
+    curriculumService: {
+        host: process.env.CURRICULUM_SERVICE_HOST ?? 'http://localhost:3004',
+        httpTimeout: parseHttpTimeout(
+            process.env.CURRICULUM_SERVICE_HTTP_TIMEOUT,
+        ),
+    },
     corsEnabledOrigins: process.env.CORS_ENABLED_ORIGINS,
 });

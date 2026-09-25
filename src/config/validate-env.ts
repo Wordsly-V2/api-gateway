@@ -11,6 +11,7 @@ const REQUIRED_ENV_VARS = [
     'AUTH_SERVICE_HOST',
     'VOCABULARY_SERVICE_HOST',
     'LEARNING_SERVICE_HOST',
+    'CURRICULUM_SERVICE_HOST',
 ] as const;
 
 export function validateEnv(

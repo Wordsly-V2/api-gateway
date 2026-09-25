@@ -21,7 +21,7 @@
  * form is not just unnecessary but harmful. The route-table spec pins this.
  */
 
-export type ServiceKey = 'auth' | 'vocabulary' | 'learning';
+export type ServiceKey = 'auth' | 'vocabulary' | 'learning' | 'curriculum';
 
 export interface ProxyRoute {
     service: ServiceKey;
@@ -59,6 +59,12 @@ export const PROXY_ROUTES: ProxyRoute[] = [
             '/notifications',
             '/level',
         ],
+    },
+    {
+        // Wordsly Path. `/admin/path` rather than a bare `/admin`, so a future
+        // admin surface in another service can claim its own prefix.
+        service: 'curriculum',
+        paths: ['/path', '/admin/path'],
     },
 ];
 
