@@ -41,11 +41,14 @@ export const PROXY_ROUTES: ProxyRoute[] = [
             // with no change in the Google console.
             '/auth',
             '/profile',
+            // Admin: accounts, roles, suspension. Each service claims its own
+            // `/admin/<x>` prefix for the data it owns; there is no bare `/admin`.
+            '/admin/users',
         ],
     },
     {
         service: 'vocabulary',
-        paths: ['/courses', '/words', '/dictionary'],
+        paths: ['/courses', '/words', '/dictionary', '/admin/vocabulary'],
     },
     {
         service: 'learning',
@@ -58,6 +61,7 @@ export const PROXY_ROUTES: ProxyRoute[] = [
             '/preferences',
             '/notifications',
             '/level',
+            '/admin/learning',
         ],
     },
     {

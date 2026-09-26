@@ -30,6 +30,9 @@ describe('PROXY_ROUTES', () => {
             ['/auth/google/redirect', 'auth'],
             ['/.well-known/jwks.json', 'auth'],
             ['/.well-known/openid-configuration', 'auth'],
+            ['/admin/users', 'auth'],
+            ['/admin/users/stats', 'auth'],
+            ['/admin/users/user-1/roles', 'auth'],
 
             ['/courses', 'vocabulary'],
             ['/courses/total-stats', 'vocabulary'],
@@ -50,6 +53,8 @@ describe('PROXY_ROUTES', () => {
             ['/dictionary/pronunciation/hello', 'vocabulary'],
             ['/dictionary/search/hello', 'vocabulary'],
             ['/dictionary/words/search/hello', 'vocabulary'],
+            ['/admin/vocabulary/health', 'vocabulary'],
+            ['/admin/vocabulary/users/user-1/courses', 'vocabulary'],
 
             ['/word-progress/record-answer/bulk-sync', 'learning'],
             ['/word-progress/due-word-ids', 'learning'],
@@ -77,6 +82,9 @@ describe('PROXY_ROUTES', () => {
             ['/notifications/subscriptions', 'learning'],
             ['/notifications/preferences', 'learning'],
             ['/notifications/vapid-public-key', 'learning'],
+            ['/admin/learning/stats', 'learning'],
+            ['/admin/learning/users/summary', 'learning'],
+            ['/admin/learning/users/user-1/reset', 'learning'],
 
             ['/path', 'curriculum'],
             ['/path/ping', 'curriculum'],
@@ -120,6 +128,13 @@ describe('PROXY_ROUTES', () => {
                 seen.set(path, route.service);
             }
         }
+    });
+
+    it('leaves a bare /admin unrouted, so no service owns the whole surface', () => {
+        // Each service claims only `/admin/<its data>`. A bare `/admin` would
+        // swallow every other service's admin routes under first-match-wins.
+        expect(serviceFor('/admin')).toBeUndefined();
+        expect(serviceFor('/admin/unknown')).toBeUndefined();
     });
 
     it('does not route anything under the retired /users prefix', () => {
